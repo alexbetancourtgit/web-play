@@ -2,7 +2,7 @@
 
 A Netflix-style launcher for games that run in the browser. Pick a game and it opens the game's own site.
 
-**Live:** https://alexbetancourtgit.github.io/web-play/
+**Live:** https://web-play-six.vercel.app/game-launcher/
 
 The game list comes from a post by [@cryptuber](https://x.com/cryptuber/status/2109519982396895375) listing AAA and classic PC games ported to the web.
 

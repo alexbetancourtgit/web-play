@@ -624,6 +624,11 @@ const GAMES = [
     desc: 'The original Diablo in your browser. Descend into the cathedral beneath Tristram.',
     scene: 'hell', c1: '#b3120a', c2: '#1a0303',
     tt: { t: 'Diablo', f: 'Pirata One', c: '#ff4122', g: '#ff1a00', s: 1.65 } },
+  { id: 'voxelrush', title: 'Voxel Rush: Frontline', url: 'https://play.voxelrush.app/?mode=frontline',
+    rows: ['military', 'online'], tags: ['Shooter', 'Vehicles', 'Multiplayer'], badges: ['Free', 'PC & mobile'], ribbon: 'Recently added',
+    desc: 'Forty-soldier battles for five flags with tanks, helicopters and FPV drones. A free voxel shooter made for the browser, on PC and mobile.',
+    scene: 'scope', c1: '#65a30d', c2: '#0f1a0a',
+    tt: { k: 'Voxel Rush', t: 'Frontline', f: 'Black Ops One', c: '#ecfccb', s: 1.05 } },
 
   // Unverified: open a warning first
   { id: 'gta5', title: 'GTA V', year: 2013, url: 'https://gta.deloskiyt.pl/',
@@ -654,6 +659,7 @@ const GAMES = [
    cover: only a box cover exists; the wide art is built from it
    shot:  only a screenshot exists; the tall art is built from it
    wideTitled: the wide image already shows the title
+   tallPlain:  the tall image has no title, so the text title is drawn on it
    Games without an entry keep the generated art. If an image fails to
    load, the generated art shows through underneath.
 ------------------------------------------------------------------- */
@@ -691,6 +697,8 @@ const ART = {
   'diablo':       { wide: 'https://images.gog-statics.com/2a351ec2315d2b082c120a1499434480758e56603d2cf21a93e544300c0f3829.png',
                     tall: 'https://images.gog-statics.com/271f23dcffc02293cc3b34e5289d8e24bfc97742dae752b809884bcf6e0f9b67.jpg',
                     wideTitled: true },  // GOG: Diablo + Hellfire
+  'voxelrush':    { wide: 'https://voxelrush.app/img/frontline-battle-1600.webp',   // the game's own Frontline art
+                    tall: 'https://voxelrush.app/img/hero-1600.webp', tallPlain: true },  // a gameplay shot cropped to a poster
   'gta5':         steam(271590),
   'gta5-archive': steam(271590),
 };
@@ -1118,7 +1126,7 @@ const NAV = [
 // ctx: 'wide' (cards, previews, popup), 'tall' (posters) or 'hero' (banner: always shows a title)
 function ttHTML(g, ctx = 'wide') {
   const a = g.art;
-  if (ctx === 'tall' && (a.tall || a.cover)) return '';   // real covers already show the title
+  if (ctx === 'tall' && (a.tall || a.cover) && !a.tallPlain) return '';   // real covers already show the title
   if (ctx !== 'tall' && a.logo) return `<span class="tt tt-img"><img src="${esc(a.logo)}" alt="${esc(g.title)}" loading="lazy" decoding="async"></span>`;
   if (ctx === 'wide' && a.wideTitled) return '';
   const t = g.tt, st = [`--tf:'${t.f}'`, `--tc:${t.c}`, `--ts:${t.s || 1}`];
@@ -1189,7 +1197,7 @@ function renderHero(i, instant) {
   cur.classList.remove('on');
   heroLayer ^= 1;
   $('#heroRating').textContent = g.year || (g.badges && g.badges[0]) || '';
-  $('#hero').classList.toggle('titled-tall', !!(g.art.tall || g.art.cover));
+  $('#hero').classList.toggle('titled-tall', !!(g.art.tall || g.art.cover) && !g.art.tallPlain);
   const box = $('#heroContent');
   clearTimeout(heroTimer);
   if (instant) { box.innerHTML = heroContentHTML(g); return; }
