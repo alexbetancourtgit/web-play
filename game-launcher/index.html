@@ -1,0 +1,1486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#141414">
+<title>PLAY//WEB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Creepster&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@700;900&family=Permanent+Marker&family=Pirata+One&family=Yellowtail&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #141414;
+    --bg2: #181818;
+    --card: #2f2f2f;
+    --text: #ffffff;
+    --muted: #a3a3a3;
+    --red: #e50914;
+    --amber: #f5a524;
+    --gut: max(16px, 4vw);
+    --gap: 8px;
+    --per: 6;
+    --per-tall: 8;
+    --cols: 6;
+    --nav-h: 68px;
+    color-scheme: dark;
+  }
+  @media (max-width: 1399px) { :root { --per: 5; --per-tall: 7; --cols: 5; } }
+  @media (max-width: 1099px) { :root { --per: 4; --per-tall: 6; --cols: 4; } }
+  @media (max-width: 799px)  { :root { --per: 3; --per-tall: 4.3; --cols: 3; } }
+  @media (max-width: 499px)  { :root { --per: 2.2; --per-tall: 3.2; --cols: 2; --gap: 6px; --nav-h: 56px; } }
+
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.4 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body.modal-open { overflow: hidden; }
+  a { color: inherit; }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    background: linear-gradient(rgba(0, 0, 0, .78), rgba(0, 0, 0, 0));
+    transition: background .35s ease;
+  }
+  .nav.solid { background: var(--bg); }
+  .nav-main {
+    height: var(--nav-h); display: flex; align-items: center;
+    gap: clamp(16px, 2.6vw, 44px); padding: 0 var(--gut);
+  }
+  .brand {
+    font: 400 clamp(26px, 2.6vw, 38px)/1 "Bebas Neue", Impact, sans-serif;
+    letter-spacing: .02em; color: var(--red);
+    background: none; border: 0; padding: 0; cursor: pointer;
+    text-shadow: 0 2px 10px rgba(229, 9, 20, .25);
+  }
+  .brand span { opacity: .75; }
+  .links { display: flex; gap: clamp(14px, 1.5vw, 22px); }
+  .links a { font-size: 14px; color: #e5e5e5; text-decoration: none; cursor: pointer; transition: color .2s; white-space: nowrap; }
+  .links a:hover { color: #b3b3b3; }
+  .links a.active { color: #fff; font-weight: 700; }
+  .links svg, .subnav svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: clamp(10px, 1.4vw, 20px); }
+
+  .search {
+    display: flex; align-items: center; height: 36px;
+    border: 1px solid transparent; transition: background .25s, border-color .25s;
+  }
+  .search.open { background: rgba(0, 0, 0, .8); border-color: rgba(255, 255, 255, .85); }
+  .icon-btn {
+    width: 36px; height: 34px; display: grid; place-items: center;
+    background: none; border: 0; color: #fff; cursor: pointer; padding: 0;
+  }
+  .icon-btn svg { width: 22px; height: 22px; }
+  .search input {
+    width: 0; padding: 0; border: 0; outline: 0; background: transparent;
+    color: #fff; font: 14px Inter, system-ui, sans-serif; transition: width .3s ease;
+  }
+  .search input::-webkit-search-cancel-button { display: none; }
+  .search.open input { width: clamp(130px, 18vw, 250px); }
+  .search .clear svg { width: 16px; height: 16px; }
+
+  .profile { position: relative; }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 5px; border: 0; cursor: pointer; padding: 0;
+    background: linear-gradient(135deg, #e50914, #7c1d6f 55%, #1d4ed8);
+    display: grid; place-items: center; color: #fff;
+  }
+  .avatar svg { width: 22px; height: 22px; }
+  .menu {
+    position: absolute; right: 0; top: calc(100% + 14px); width: 260px;
+    background: rgba(0, 0, 0, .94); border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 4px; padding: 8px 0; box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
+  }
+  .menu::before {
+    content: ""; position: absolute; top: -7px; right: 12px;
+    border: 7px solid transparent; border-top: 0; border-bottom-color: rgba(255, 255, 255, .7);
+  }
+  .menu-item {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 10px 16px; background: none; border: 0; color: #fff;
+    font-size: 14px; text-align: left; cursor: pointer;
+  }
+  .menu-item:hover { text-decoration: underline; }
+  .menu-item input { accent-color: var(--red); width: 16px; height: 16px; margin: 0; }
+  .menu hr { border: 0; border-top: 1px solid rgba(255, 255, 255, .16); margin: 6px 0; }
+
+  .subnav { display: none; align-items: center; gap: 8px; padding: 0 var(--gut) 12px; overflow-x: auto; scrollbar-width: none; }
+  .subnav::-webkit-scrollbar { display: none; }
+  .subnav a {
+    flex: none; border: 1px solid rgba(255, 255, 255, .45); border-radius: 999px;
+    padding: 6px 14px; font-size: 13px; text-decoration: none; white-space: nowrap; cursor: pointer;
+  }
+  .subnav a.active { background: #fff; color: #000; border-color: #fff; }
+  @media (max-width: 899px) {
+    .links { display: none; }
+    .subnav { display: flex; }
+  }
+
+  /* ---------- Title treatments ---------- */
+  .tt {
+    --tk: 12cqi;
+    display: flex; flex-direction: column; align-items: flex-start; gap: .12em;
+    font-family: var(--tf), Inter, sans-serif; color: var(--tc, #fff);
+    line-height: .92; max-width: 100%; pointer-events: none;
+    transform: rotate(var(--tr, 0deg)); transform-origin: 0 100%;
+  }
+  .tt-m {
+    font-size: calc(var(--ts, 1) * var(--tk));
+    letter-spacing: var(--tls, 0); text-transform: var(--ttx, none); font-style: var(--tfs, normal);
+    -webkit-text-stroke: var(--tsw, 0) var(--tst, transparent); paint-order: stroke fill;
+    text-shadow: 0 0 .35em var(--tg, transparent), 0 .04em .22em rgba(0, 0, 0, .6);
+    text-wrap: balance; overflow-wrap: break-word; max-width: 100%;
+  }
+  .tt-k, .tt-s {
+    font: 800 max(7px, calc(var(--tk) * .26))/1 Inter, sans-serif;
+    letter-spacing: .24em; text-transform: uppercase; color: #fff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, .85);
+  }
+  .tt-s { letter-spacing: .42em; margin-top: .2em; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative; height: 56.25vw; min-height: 540px; max-height: 100vh;
+    overflow: hidden; background: #000;
+  }
+  .hero-art {
+    position: absolute; inset: 0; background-size: cover; background-position: center;
+    opacity: 0; transform: scale(1.04); transition: opacity 1.1s ease;
+  }
+  .hero-art.on { opacity: 1; animation: kenburns 14s ease-out forwards; }
+  @keyframes kenburns { from { transform: scale(1.04); } to { transform: scale(1.13); } }
+  .grain::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .22; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .hero-shade {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(77deg, rgba(0, 0, 0, .78) 0%, rgba(0, 0, 0, .38) 36%, rgba(0, 0, 0, 0) 66%),
+      linear-gradient(to top, var(--bg) 0%, rgba(20, 20, 20, .55) 13%, rgba(20, 20, 20, 0) 32%);
+  }
+  .hero-content {
+    position: absolute; left: var(--gut); bottom: calc(7vw + 64px);
+    width: min(42vw, 640px); transition: opacity .3s ease, transform .3s ease;
+  }
+  .hero-content.fade { opacity: 0; transform: translateY(10px); }
+  .hero-kicker {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+    font: 700 13px/1 Inter, sans-serif; letter-spacing: .38em; color: #d6d6d6;
+  }
+  .hero-kicker .mark { font: 400 26px/1 "Bebas Neue", sans-serif; letter-spacing: .02em; color: var(--red); }
+  .hero-tt { container-type: inline-size; width: min(36vw, 520px); margin-bottom: 18px; }
+  .hero-rank { display: flex; align-items: center; gap: 12px; font: 700 clamp(15px, 1.45vw, 22px)/1.2 Inter, sans-serif; margin-bottom: 12px; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+  .hero-desc {
+    font-size: clamp(14px, 1.25vw, 19px); line-height: 1.42; margin: 0 0 22px; max-width: 34em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-rating {
+    position: absolute; right: 0; bottom: calc(7vw + 90px);
+    background: rgba(51, 51, 51, .6); border-left: 3px solid #dcdcdc;
+    padding: .45em calc(var(--gut) + 10px) .45em .8em; font-size: clamp(13px, 1.1vw, 17px);
+  }
+  .hero-dots { display: flex; gap: 6px; margin-top: 28px; }
+  .hero-dot {
+    position: relative; width: 22px; height: 4px; border: 0; padding: 0; border-radius: 2px;
+    background: rgba(255, 255, 255, .3); cursor: pointer; overflow: hidden; transition: width .3s ease;
+  }
+  .hero-dot i { position: absolute; inset: 0; background: #fff; transform: scaleX(0); transform-origin: left; }
+  .hero-dot.on { width: 46px; }
+  .hero-dot.on i { animation: heroFill 9s linear forwards; }
+  .hero:hover .hero-dot.on i, body.modal-open .hero-dot.on i { animation-play-state: paused; }
+  @keyframes heroFill { to { transform: scaleX(1); } }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    height: clamp(40px, 3.1vw, 52px); padding: 0 clamp(18px, 2vw, 30px);
+    border-radius: 6px; border: 0; cursor: pointer; text-decoration: none;
+    font: 700 clamp(15px, 1.15vw, 19px)/1 Inter, sans-serif; transition: background .2s;
+  }
+  .btn svg { width: 1.45em; height: 1.45em; flex: none; }
+  .btn-play { background: #fff; color: #000; }
+  .btn-play:hover { background: rgba(255, 255, 255, .75); }
+  .btn-info { background: rgba(109, 109, 110, .7); color: #fff; }
+  .btn-info:hover { background: rgba(109, 109, 110, .45); }
+  .btn-warn { background: var(--amber); color: #1a1000; }
+  .btn-warn:hover { background: #ffc15a; }
+  .circle {
+    width: 40px; height: 40px; flex: none; border-radius: 50%; padding: 0;
+    border: 2px solid rgba(255, 255, 255, .55); background: rgba(42, 42, 42, .6); color: #fff;
+    display: inline-grid; place-items: center; cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .circle:hover { border-color: #fff; background: rgba(255, 255, 255, .1); }
+  .circle svg { width: 55%; height: 55%; }
+  .circle.play { background: #fff; border-color: #fff; color: #000; }
+  .circle.play:hover { background: #d6d6d6; }
+  .circle.more { margin-left: auto; }
+  .circle.big { width: 46px; height: 46px; }
+  .circle.sm { width: 34px; height: 34px; }
+
+  /* Badges */
+  .t10 {
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 26px; height: 30px; background: var(--red); color: #fff; border-radius: 2px; flex: none;
+    font: 800 7px/1 Inter, sans-serif; letter-spacing: .06em;
+  }
+  .t10 b { font-size: 13px; letter-spacing: 0; margin-top: 1px; }
+  .hero-rank .t10 { width: 32px; height: 38px; font-size: 8px; }
+  .hero-rank .t10 b { font-size: 17px; }
+  .box { border: 1px solid rgba(255, 255, 255, .42); padding: 1px 6px; font-size: 11px; border-radius: 3px; white-space: nowrap; }
+  .warn-tag { background: var(--amber); color: #1a1000; font-weight: 800; font-size: 11px; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: .04em; }
+
+  /* ---------- Rows ---------- */
+  .rows { position: relative; z-index: 2; margin-top: -7vw; padding-bottom: 24px; }
+  .row { margin-bottom: max(26px, 3vw); }
+  .row-head { display: flex; align-items: baseline; gap: 14px; margin: 0 var(--gut) 10px; }
+  .row-title { margin: 0; font: 700 clamp(16px, 1.4vw, 22px)/1.2 Inter, sans-serif; color: #e5e5e5; }
+  .row-note { font-size: 13px; color: var(--muted); }
+  .explore {
+    background: none; border: 0; padding: 0; cursor: pointer; color: #54b9c5;
+    font: 700 13px/1 Inter, sans-serif; opacity: 0; transform: translateX(-8px); transition: opacity .25s, transform .25s;
+  }
+  .row:hover .explore, .explore:focus-visible { opacity: 1; transform: none; }
+  @media (hover: none) { .explore { opacity: 1; transform: none; } }
+  .row-wrap { position: relative; }
+  .track {
+    display: grid; grid-auto-flow: column; gap: var(--gap);
+    grid-auto-columns: calc((100% - (var(--per) - 1) * var(--gap)) / var(--per));
+    overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+    scroll-snap-type: x mandatory; scroll-padding-inline: var(--gut);
+    padding: 4px var(--gut) 8px;
+  }
+  .track::-webkit-scrollbar { display: none; }
+  .row-arrow {
+    position: absolute; top: 4px; bottom: 8px; z-index: 3; width: calc(var(--gut) - 4px);
+    display: grid; place-items: center; border: 0; padding: 0; cursor: pointer; color: #fff;
+    background: rgba(20, 20, 20, .6); opacity: 0; transition: opacity .2s, background .2s;
+  }
+  .row-arrow:hover { background: rgba(20, 20, 20, .85); }
+  .row-arrow svg { width: 70%; max-width: 40px; transition: transform .15s; }
+  .row-arrow:hover svg { transform: scale(1.25); }
+  .row-arrow.prev { left: 0; border-radius: 0 4px 4px 0; }
+  .row-arrow.next { right: 0; border-radius: 4px 0 0 4px; }
+  .row:hover .row-arrow, .row-arrow:focus-visible { opacity: 1; }
+  @media (hover: none) { .row-arrow { display: none; } }
+  .row-wrap:has(.card-recent) .row-arrow { bottom: 30px; }
+
+  /* ---------- Cards ---------- */
+  .card { position: relative; min-width: 0; scroll-snap-align: start; }
+  .card-hit {
+    position: relative; display: block; width: 100%; aspect-ratio: 16 / 9;
+    border-radius: 6px; overflow: hidden; container-type: inline-size;
+    background-color: #222; background-size: cover; background-position: center;
+    color: #fff; text-decoration: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+    transition: filter .2s;
+  }
+  .card-hit::before {
+    content: ""; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(to top, rgba(0, 0, 0, .62), rgba(0, 0, 0, 0) 58%);
+  }
+  .card-hit:hover { filter: brightness(1.1); }
+  .card-hit .tt { position: absolute; left: 6cqi; right: 6cqi; bottom: 7cqi; z-index: 2; }
+  .card-hit.has-ribbon .tt { bottom: 14cqi; }
+  .ribbon {
+    position: absolute; left: 50%; bottom: 0; z-index: 2; transform: translateX(-50%);
+    background: var(--red); color: #fff; white-space: nowrap;
+    font: 700 max(9px, 3.4cqi)/1 Inter, sans-serif; padding: .4em .8em; border-radius: 3px 3px 0 0;
+  }
+  .ribbon.warn { background: var(--amber); color: #1a1000; text-transform: uppercase; letter-spacing: .05em; }
+  .t10.corner { position: absolute; top: 0; right: 5cqi; z-index: 2; width: max(18px, 8cqi); height: max(22px, 9.6cqi); font-size: max(5px, 2.3cqi); border-radius: 0 0 2px 2px; }
+  .t10.corner b { font-size: max(9px, 4.2cqi); }
+  .card-sub { margin-top: 7px; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-more {
+    position: absolute; top: 6px; left: 6px; z-index: 4;
+    width: 28px; height: 28px; border-radius: 50%; padding: 0; cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, .6); background: rgba(0, 0, 0, .55); color: #fff;
+    display: grid; place-items: center; opacity: 0; transition: opacity .2s;
+  }
+  .card-more svg { width: 18px; height: 18px; }
+  .card:focus-within .card-more { opacity: 1; }
+  @media (hover: none) { .card-more { opacity: 1; } }
+
+  /* Top 10 */
+  .card-top { aspect-ratio: 1.3 / 1; container-type: inline-size; }
+  .card-top .rank {
+    position: absolute; left: -1%; bottom: -.115em; z-index: 0;
+    font: 400 92cqi/1 Anton, Impact, sans-serif; letter-spacing: -.09em;
+    color: var(--bg); -webkit-text-stroke: max(2px, 1.1cqi) #5e5e5e; user-select: none;
+  }
+  .card-top .card-hit.poster {
+    position: absolute; top: 0; right: 0; bottom: 0; width: 52%; height: 100%;
+    aspect-ratio: auto; z-index: 1; box-shadow: -8px 0 18px rgba(0, 0, 0, .45);
+  }
+  .poster .tt { --tk: 15cqi; left: 7cqi; right: 7cqi; bottom: 9cqi; align-items: center; text-align: center; transform-origin: 50% 100%; }
+  .card-top .card-more { left: auto; right: 6px; }
+
+  .track-tall { grid-auto-columns: calc((100% - (var(--per-tall) - 1) * var(--gap)) / var(--per-tall)); }
+  .card-tall .card-hit { aspect-ratio: 2 / 3; }
+
+  /* ---------- Hover preview ---------- */
+  .preview {
+    position: absolute; z-index: 45; background: var(--bg2); border-radius: 8px; overflow: hidden;
+    box-shadow: 0 16px 44px rgba(0, 0, 0, .8); opacity: 0; transform: scale(var(--ps, .66));
+    transition: transform .3s cubic-bezier(.2, .8, .2, 1), opacity .18s ease;
+  }
+  .preview.show { opacity: 1; transform: none; }
+  .pv-art {
+    position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; padding: 0;
+    background-size: cover; background-position: center; container-type: inline-size; color: #fff; cursor: pointer;
+  }
+  .pv-art::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, var(--bg2) 0%, rgba(24, 24, 24, 0) 32%); }
+  .pv-art .tt { position: absolute; left: 6cqi; right: 6cqi; bottom: 9cqi; z-index: 2; }
+  .pv-body { padding: 10px 16px 18px; }
+  .pv-actions { display: flex; align-items: center; gap: 8px; }
+  .pv-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; font-size: 14px; color: #bcbcbc; }
+  .pv-tags { margin-top: 10px; font-size: 14px; color: #fff; }
+  .pv-tags span + span::before { content: "•"; color: #646464; margin: 0 7px; }
+
+  /* ---------- Pages (grid views) ---------- */
+  .page { padding: calc(var(--nav-h) + 44px) var(--gut) 40px; min-height: 72vh; }
+  @media (max-width: 899px) { .page { padding-top: calc(var(--nav-h) + 74px); } }
+  .page h1 { font: 700 clamp(24px, 2.6vw, 38px)/1.2 Inter, sans-serif; margin: 0 0 8px; }
+  .page-note { color: var(--muted); margin: 0 0 28px; max-width: 46em; }
+  .grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: max(26px, 3vw) var(--gap); }
+
+  /* ---------- Detail modal ---------- */
+  .detail {
+    width: min(880px, calc(100vw - 24px)); max-height: calc(100vh - 48px); margin: 24px auto auto;
+    padding: 0; border: 0; border-radius: 10px; background: var(--bg2); color: #fff;
+    overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 24px 70px rgba(0, 0, 0, .85);
+  }
+  .detail::backdrop { background: rgba(0, 0, 0, .72); }
+  .detail[open] { animation: pop .28s cubic-bezier(.2, .8, .2, 1); }
+  @keyframes pop { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+  .d-hero { position: relative; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
+  .d-hero::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, var(--bg2) 0%, rgba(24, 24, 24, .5) 24%, rgba(24, 24, 24, 0) 52%); }
+  .d-close {
+    position: absolute; top: 14px; right: 14px; z-index: 3; width: 38px; height: 38px; border-radius: 50%;
+    background: #181818; border: 0; color: #fff; cursor: pointer; display: grid; place-items: center; padding: 0;
+  }
+  .d-close svg { width: 22px; height: 22px; }
+  .d-hero-in { position: absolute; left: 5%; right: 5%; bottom: 7%; z-index: 2; }
+  .d-tt { container-type: inline-size; width: min(50%, 400px); margin-bottom: 22px; }
+  .d-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .d-body { padding: 6px 5% 40px; }
+  .d-warn {
+    display: flex; gap: 10px; align-items: flex-start;
+    background: rgba(245, 165, 36, .12); border: 1px solid rgba(245, 165, 36, .55); color: #ffd99c;
+    border-radius: 6px; padding: 12px 14px; margin: 8px 0 20px; font-size: 14px; line-height: 1.5;
+  }
+  .d-warn svg { width: 20px; height: 20px; flex: none; margin-top: 1px; color: var(--amber); }
+  .d-cols { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+  .d-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; color: #bcbcbc; font-size: 15px; margin-bottom: 14px; }
+  .d-desc { font-size: 16px; line-height: 1.55; margin: 0; }
+  .d-side p { margin: 0 0 10px; font-size: 14px; color: #ddd; overflow-wrap: anywhere; }
+  .d-side span { color: #777; }
+  .d-h3 { font-size: 22px; margin: 36px 0 16px; }
+  .d-more { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .m-card { background: var(--card); border-radius: 6px; overflow: hidden; }
+  .m-art {
+    position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; padding: 0;
+    background-size: cover; background-position: center; container-type: inline-size; color: #fff; cursor: pointer;
+  }
+  .m-art::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0) 55%); }
+  .m-art .tt { position: absolute; left: 7cqi; right: 7cqi; bottom: 8cqi; z-index: 2; }
+  .m-play {
+    position: absolute; top: 50%; left: 50%; z-index: 3; width: 46px; height: 46px; margin: -23px 0 0 -23px;
+    border-radius: 50%; border: 1px solid #fff; background: rgba(30, 30, 30, .55);
+    display: grid; place-items: center; opacity: 0; transition: opacity .2s;
+  }
+  .m-play svg { width: 20px; height: 20px; }
+  .m-art:hover .m-play, .m-art:focus-visible .m-play { opacity: 1; }
+  .m-body { padding: 12px 14px 16px; }
+  .m-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #bcbcbc; font-size: 14px; }
+  .m-title { font-weight: 700; margin: 8px 0 6px; font-size: 15px; }
+  .m-body p { margin: 0; font-size: 13px; line-height: 1.45; color: #d2d2d2; }
+  @media (max-width: 700px) {
+    .d-cols { grid-template-columns: 1fr; gap: 14px; }
+    .d-more { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .d-tt { width: 68%; }
+    .detail { margin-top: 12px; max-height: calc(100vh - 24px); }
+  }
+
+  /* ---------- Footer ---------- */
+  .footer { max-width: 1000px; margin: 30px auto 0; padding: 20px var(--gut) 60px; color: #808080; font-size: 13px; }
+  .f-links { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-bottom: 22px; }
+  .f-links a { cursor: pointer; text-decoration: none; }
+  .f-links a:hover { text-decoration: underline; }
+  .footer details { border: 1px solid #333; border-radius: 4px; padding: 12px 14px; margin-bottom: 18px; }
+  .footer summary { cursor: pointer; color: #bbb; font-weight: 600; }
+  .footer li { margin: 8px 0; }
+  .footer b { color: #ccc; font-weight: 600; }
+  .footer p { margin: 8px 0; line-height: 1.55; }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width: 799px) {
+    .hero { height: 78vh; min-height: 480px; }
+    .rows { margin-top: 0; }
+    .hero-content { bottom: 28px; right: var(--gut); width: auto; }
+    .hero-tt { width: min(72vw, 420px); }
+    .hero-desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .hero-rating { display: none; }
+    .hero-kicker { font-size: 11px; }
+    .hero-shade { background: linear-gradient(to top, var(--bg) 0%, rgba(20,20,20,.75) 35%, rgba(20,20,20,0) 70%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  /* ---------- Artwork: every game has --wide (16:9) and --tall (2:3) layers ---------- */
+  /* Kept last so these shorthands win over the size/position set on each element above */
+  .card-hit, .pv-art, .m-art, .d-hero, .hero-art { background: var(--wide); }
+  .card-hit.poster { background: var(--tall); }
+  @media (max-width: 799px) {
+    .hero-art { background: var(--tall); }
+    /* the phone banner shows the vertical cover, which already has the title on it */
+    .hero.titled-tall .hero-tt, .hero.titled-tall .hero-kicker { display: none; }
+  }
+  .tt-img img {
+    display: block; width: auto; height: auto; max-width: 72cqi; max-height: calc(var(--tk) * 2.6);
+    object-fit: contain; object-position: left bottom; filter: drop-shadow(0 2px 10px rgba(0, 0, 0, .65));
+  }
+  .hero-tt .tt-img img, .d-tt .tt-img img { max-width: 100%; }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav-main">
+    <button class="brand" type="button" data-go="home" aria-label="PLAY//WEB home">PLAY<span>//</span>WEB</button>
+    <div class="links" id="links"></div>
+    <div class="nav-right">
+      <div class="search" id="search">
+        <button class="icon-btn" id="searchBtn" type="button" aria-label="Search"></button>
+        <input id="q" type="search" placeholder="Titles, genres" autocomplete="off" aria-label="Search games">
+        <button class="icon-btn clear" id="qClear" type="button" aria-label="Clear search" hidden></button>
+      </div>
+      <div class="profile">
+        <button class="avatar" id="avatarBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Settings"></button>
+        <div class="menu" id="menu" hidden>
+          <label class="menu-item"><input type="checkbox" id="newtab"> Open games in a new tab</label>
+          <hr>
+          <button class="menu-item" type="button" id="clearRecent">Clear Continue Playing</button>
+          <button class="menu-item" type="button" id="showRemoved">Links left out of the list</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="subnav" id="subnav"></div>
+</nav>
+
+<header class="hero grain" id="hero">
+  <div class="hero-art" id="heroA"></div>
+  <div class="hero-art" id="heroB"></div>
+  <div class="hero-shade"></div>
+  <div class="hero-content" id="heroContent"></div>
+  <div class="hero-rating" id="heroRating"></div>
+</header>
+
+<main class="rows" id="rows"></main>
+
+<section class="page" id="page" hidden>
+  <h1 id="pageTitle"></h1>
+  <p class="page-note" id="pageNote"></p>
+  <div class="grid" id="pageGrid"></div>
+</section>
+
+<footer class="footer" id="footer">
+  <div class="f-links" id="fLinks"></div>
+  <details id="removed">
+    <summary>Links from the original post that were left out</summary>
+    <ul id="removedList"></ul>
+  </details>
+  <p>Every game here is hosted by a third party. This page only links to them. Most are unofficial fan ports, and some ask for your own game files. Don't enter passwords or payment details on any of them.</p>
+  <p>Game artwork belongs to its publishers and is loaded from Steam, GOG, Wikipedia and the games' own sites.</p>
+  <p>Links last checked <b id="checked"></b>. To add a game, edit the <b>GAMES</b> list at the bottom of this file.</p>
+</footer>
+
+<div class="preview" id="preview" hidden></div>
+<dialog class="detail" id="detail"><div id="detailBody"></div></dialog>
+
+<script>
+/* ==================================================================
+   GAME LIST: add, remove or edit games here.
+   rows:    which home rows the game shows in (see ROWS below)
+   scene:   generated key art: sunset | city | clouds | rays | pitch |
+            neon | moon | scope | ring | hell | lab | archive
+   c1, c2:  the two main colors of that art
+            (real game images are set in the ART list below)
+   tt:      title treatment: k = small line above, t = title,
+            sub = small line below, f = font, c = color, g = glow,
+            st/sw = outline color/width, s = size, ls = letter spacing,
+            up = uppercase, i = italic, r = rotation in degrees
+   caution: if set, the game opens a warning instead of the link
+================================================================== */
+const CHECKED = 'Oct 16, 2026';
+
+const GAMES = [
+  { id: 'gta-vc', title: 'GTA: Vice City', year: 2002, url: 'https://joncodeofficial.github.io/gta-vice-city-wasm/',
+    rows: ['open'], tags: ['Open world', 'Crime', 'Driving'], badges: ['WASM port'],
+    desc: 'Vice City, 1986. Neon nights, pastel suits and a crime empire to build, running in your browser through a fan-made WebAssembly port.',
+    scene: 'sunset', c1: '#ff3d9a', c2: '#3a1470',
+    tt: { k: 'Grand Theft Auto', t: 'Vice City', f: 'Yellowtail', c: '#ff8bd1', g: '#ff2e9a', s: 1.2 } },
+  { id: 'shar', title: 'The Simpsons: Hit & Run', year: 2003, url: 'https://shar-wasm.cjoseph.workers.dev/?skipmovie',
+    rows: ['open'], tags: ['Open world', 'Comedy', 'Driving'], badges: ['WASM port'],
+    desc: 'Drive, punch and gag your way around Springfield in the 2003 cult classic, rebuilt as a WebAssembly port.',
+    scene: 'clouds', c1: '#d4ecff', c2: '#2f86e8',
+    tt: { k: 'The Simpsons', t: 'Hit & Run', f: 'Bungee', c: '#ffd90f', st: '#2b1a00', sw: .06, s: .95 } },
+  { id: 'skate3', title: 'Skate 3', url: 'https://skate.aaddpp.lol/',
+    rows: ['open'], tags: ['Skateboarding', 'Sandbox'], badges: ['Fan game'],
+    desc: 'A fan-made take on Skate 3: flick-it tricks, long lines and even longer bails.',
+    scene: 'rays', c1: '#ff6a1a', c2: '#3a0d05',
+    tt: { t: 'skate. 3', f: 'Permanent Marker', c: '#ffffff', s: 1.05, r: -5 } },
+  { id: 'pes6', title: 'PES 6', year: 2006, url: 'https://pes6.optijuegos.net/',
+    rows: ['open', 'online'], tags: ['Football', 'Sports'], badges: ['Online'],
+    desc: 'The PES 6 era of football, ported to the web with online play.',
+    scene: 'pitch', c1: '#1f8a46', c2: '#071a0e',
+    tt: { k: 'Pro Evolution Soccer', t: 'PES 6', f: 'Anton', c: '#ffffff', s: 1.25, i: true } },
+  { id: 'wasmarcade', title: 'WASM Arcade', url: 'https://wasmarcade.com/',
+    rows: ['open', 'retro'], tags: ['Arcade', 'Collection'], badges: ['532 games'], ribbon: '532 games',
+    desc: 'A whole arcade in one tab: GTA III, Vice City, Simpsons Hit & Run, Minecraft, Neo Geo and Capcom classics, plus Flash games.',
+    scene: 'neon', c1: '#a855f7', c2: '#3b0764',
+    tt: { k: 'Arcade collection', t: 'WASM Arcade', f: 'Orbitron', c: '#f3e8ff', g: '#c084fc', s: .72, up: true } },
+
+  { id: 'bo1z', title: 'Black Ops Zombies', year: 2010, url: 'https://vel.gg/bo1z',
+    rows: ['dark', 'military'], tags: ['Zombies', 'Survival', 'Shooter'],
+    desc: 'Round-based survival on classic Black Ops zombies maps. Hold out as long as you can.',
+    scene: 'moon', c1: '#b91c1c', c2: '#3b0a0a',
+    tt: { k: 'Black Ops', t: 'Zombies', f: 'Creepster', c: '#ff3131', g: '#8b0000', s: 1.2 } },
+
+  { id: 'bo2', title: 'Black Ops 2', url: 'https://vibeslops.luckeysystems.com/',
+    rows: ['military'], tags: ['Shooter', 'Military'],
+    desc: 'A browser shooter project called vibeslops, listed as Black Ops 2 in the original post.',
+    scene: 'scope', c1: '#f97316', c2: '#1c1208',
+    tt: { t: 'Black Ops II', f: 'Black Ops One', c: '#ff9a3d', s: .85 } },
+  { id: 'mw2', title: 'Contemporary Conflict', url: 'https://ovz-game-production.up.railway.app/',
+    rows: ['military'], tags: ['Shooter', 'Military'],
+    desc: 'Contemporary Conflict: Global Flashpoint, a browser shooter in the style of Modern Warfare 2.',
+    scene: 'scope', c1: '#9ca35a', c2: '#14170c',
+    tt: { k: 'Contemporary Conflict', t: 'Global Flashpoint', f: 'Black Ops One', c: '#ecebd2', s: .62 } },
+  { id: 'halo', title: 'Halo: Combat Evolved', year: 2001, url: 'https://mitchellhynes.com/halo/',
+    rows: ['arena', 'retro'], tags: ['Sci-fi', 'Shooter'],
+    desc: 'Halo: Combat Evolved in a browser tab. Master Chief, the Warthog and the ring.',
+    scene: 'ring', c1: '#0f766e', c2: '#0b2540',
+    tt: { t: 'Halo', sub: 'Combat Evolved', f: 'Orbitron', c: '#eef7ff', g: '#7dd3fc', s: 1.3, ls: .18, up: true } },
+  { id: 'halo-mobile', title: 'Halo CE Mobile', year: 2001, url: 'https://hcemobile.com/',
+    rows: ['arena'], tags: ['Sci-fi', 'Shooter', 'Mobile'], badges: ['Mobile'], ribbon: 'Built for phones',
+    desc: 'Halo: Combat Evolved Mobile, a version made for phones and tablets.',
+    scene: 'ring', c1: '#2563eb', c2: '#0b1640',
+    tt: { t: 'Halo', sub: 'CE Mobile', f: 'Orbitron', c: '#eef7ff', g: '#93c5fd', s: 1.3, ls: .18, up: true } },
+  { id: 'q1', title: 'Quake', year: 1996, url: 'https://q1.pieter.com/',
+    rows: ['arena', 'online', 'retro', 'dark'], tags: ['Shooter', 'Multiplayer'], badges: ['Unofficial'],
+    desc: 'QuakeWorld multiplayer: the 1996 shooter that defined fast online deathmatch.',
+    scene: 'hell', c1: '#8a4b1f', c2: '#2a1408',
+    tt: { t: 'Quake', f: 'Pirata One', c: '#e0bd92', s: 1.6 } },
+  { id: 'q2', title: 'Quake II', year: 1997, url: 'https://q2.pieter.com/',
+    rows: ['arena', 'online', 'retro'], tags: ['Shooter', 'Multiplayer'], badges: ['Unofficial'],
+    desc: 'Quake II multiplayer in the browser. Railguns, rocket jumps and the Strogg.',
+    scene: 'hell', c1: '#5f7a2a', c2: '#141a08',
+    tt: { t: 'Quake II', f: 'Pirata One', c: '#cddc98', s: 1.35 } },
+  { id: 'q3', title: 'Quake III Arena', year: 1999, url: 'https://q3.pieter.com/',
+    rows: ['arena', 'online'], tags: ['Arena shooter', 'Multiplayer'], badges: ['Unofficial'],
+    desc: 'Quake III Arena, the pure arena shooter, playable online in a tab.',
+    scene: 'hell', c1: '#c2261b', c2: '#2a0606',
+    tt: { t: 'Quake III', sub: 'Arena', f: 'Pirata One', c: '#ff6a4d', s: 1.35 } },
+  { id: 'rtcw', title: 'Return to Castle Wolfenstein', year: 2001, url: 'https://rtcw.pieter.com/',
+    rows: ['military', 'online', 'retro'], tags: ['Shooter', 'Multiplayer'], badges: ['Unofficial'],
+    desc: "Return to Castle Wolfenstein's team multiplayer, online in the browser.",
+    scene: 'scope', c1: '#a8a29e', c2: '#2a0a0a',
+    tt: { k: 'Return to Castle', t: 'Wolfenstein', f: 'Black Ops One', c: '#f5f5f4', s: .85 } },
+  { id: 'urt', title: 'Urban Terror', year: 2000, url: 'https://ut.pieter.com/',
+    rows: ['military', 'online'], tags: ['Tactical shooter', 'Multiplayer'], badges: ['Unofficial'],
+    desc: 'Urban Terror, a free team shooter known for its wall-jumping movement. The original post lists it as Unreal Tournament.',
+    scene: 'scope', c1: '#c9a25a', c2: '#231a0a',
+    tt: { k: 'Urban', t: 'Terror', f: 'Anton', c: '#f7e3b5', s: 1.4, up: true } },
+  { id: 'hl', title: 'Half-Life', year: 1998, url: 'https://pixelsuft.github.io/hl/',
+    rows: ['retro', 'dark'], tags: ['Sci-fi', 'Shooter', 'Story'],
+    desc: 'Half-Life, the 1998 shooter that changed the genre, ported to the web by Pixelsuft.',
+    scene: 'lab', c1: '#ff8a1f', c2: '#1c130a',
+    tt: { t: 'Half-Life', f: 'Bebas Neue', c: '#ffb44d', s: 1.6, ls: .04, up: true } },
+  { id: 'webxash', title: 'Half-Life & CS 1.6', url: 'https://x8bitrain.github.io/webXash/',
+    rows: ['retro', 'military'], tags: ['Shooter', 'Two games'], badges: ['Xash3D'], ribbon: '2 games',
+    desc: 'Half-Life and Counter-Strike 1.6 on Xash3D, an open-source engine, compiled for the web.',
+    scene: 'lab', c1: '#38bdf8', c2: '#0b1a2a',
+    tt: { k: 'WebXash', t: 'Half-Life & CS 1.6', f: 'Bebas Neue', c: '#e0f2fe', s: .9 } },
+  { id: 'surf', title: 'CS Surf', url: 'https://surfd.net/',
+    rows: ['open'], tags: ['Movement', 'Skill'],
+    desc: "Counter-Strike style surf: slide along angled ramps, keep your speed and don't fall.",
+    scene: 'neon', c1: '#22d3ee', c2: '#0c2a5a',
+    tt: { k: 'Surfd', t: 'Surf', f: 'Bungee', c: '#cffafe', g: '#22d3ee', s: 1.3 } },
+  { id: 'diablo', title: 'Diablo', year: 1996, url: 'https://johnimril.github.io/diablo_web/',
+    rows: ['dark', 'retro'], tags: ['Action RPG', 'Dungeon crawler'],
+    desc: 'The original Diablo in your browser. Descend into the cathedral beneath Tristram.',
+    scene: 'hell', c1: '#b3120a', c2: '#1a0303',
+    tt: { t: 'Diablo', f: 'Pirata One', c: '#ff4122', g: '#ff1a00', s: 1.65 } },
+
+  // Unverified: open a warning first
+  { id: 'gta5', title: 'GTA V', year: 2013, url: 'https://gta.deloskiyt.pl/',
+    rows: ['caution'], tags: ['Open world', 'Crime'],
+    desc: 'A site that claims to run GTA V in the browser.',
+    caution: 'This link now redirects to fiveplay.lol, a different domain. GTA V is a very large game, so a "browser version" is probably a stream or a scam.',
+    scene: 'city', c1: '#f59e0b', c2: '#1f3b2c',
+    tt: { k: 'Grand Theft Auto', t: 'V', f: 'Anton', c: '#ffffff', st: '#000000', sw: .03, s: 2.4 } },
+  { id: 'gta5-archive', title: 'GTA V (archived)', url: 'https://web.archive.org/web/20261006055917/https://playgta5.com/',
+    rows: ['caution'], tags: ['Archive'],
+    desc: 'An old Wayback Machine snapshot of playgta5.com.',
+    caution: "This snapshot only shows a loading screen and probably won't play.",
+    scene: 'archive', c1: '#71717a', c2: '#09090b',
+    tt: { k: 'Archived', t: 'GTA V', f: 'Anton', c: '#d4d4d8', s: 1.4 } },
+  { id: 'hedgewars', title: 'Hedgewars', url: 'https://webwars.link/',
+    rows: ['caution'], tags: ['Strategy', 'Turn-based'],
+    desc: 'Turn-based hedgehog warfare in the spirit of Worms.',
+    caution: "This site didn't respond when the links were checked. It may be down.",
+    scene: 'clouds', island: true, c1: '#bfdbfe', c2: '#1e40af',
+    tt: { t: 'Hedgewars', f: 'Bungee', c: '#ffffff', st: '#1e3a8a', sw: .06, s: .85 } },
+];
+
+/* ------------------------------------------------------------------
+   REAL ARTWORK, hot-linked from official stores and Wikipedia.
+   wide:  16:9 key art (Steam's library hero has no title on it)
+   tall:  2:3 cover, already has the game's title on it
+   logo:  transparent title logo shown over the wide art
+   cover: only a box cover exists; the wide art is built from it
+   shot:  only a screenshot exists; the tall art is built from it
+   wideTitled: the wide image already shows the title
+   Games without an entry keep the generated art. If an image fails to
+   load, the generated art shows through underneath.
+------------------------------------------------------------------- */
+const STEAM = 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/';
+const WIKI = 'https://upload.wikimedia.org/wikipedia/en/';
+const steam = (id, logo = true) => ({
+  wide: `${STEAM}${id}/library_hero.jpg`,
+  tall: `${STEAM}${id}/library_600x900_2x.jpg`,
+  logo: logo ? `${STEAM}${id}/logo.png` : null,
+});
+const HALO = {
+  wide: `${STEAM}976730/library_hero.jpg`,                                    // The Master Chief Collection
+  tall: `${WIKI}8/80/Halo_-_Combat_Evolved_%28XBox_version_-_box_art%29.jpg`,  // original box art
+};
+const ART = {
+  'gta-vc':       steam(12110),
+  'shar':         { cover: `${WIKI}5/5f/The_Simpsons_Hit_and_Run_cover.png` },
+  'skate3':       { cover: `${WIKI}8/84/Skate-3-Boxart.jpg` },
+  'pes6':         { cover: `${WIKI}0/0f/PES6.jpg` },
+  // wasmarcade: the site blocks other pages from showing its images, so it keeps the generated art
+  // hedgewars: no official artwork found, so it keeps the generated art
+  'bo1z':         steam(42700, false),   // Call of Duty: Black Ops
+  'bo2':          steam(202970),
+  'mw2':          steam(10180, false),   // Modern Warfare 2 (2009), what the post calls this game
+  'halo':         HALO,
+  'halo-mobile':  HALO,
+  'q1':           steam(2310, false),    // the Quake logos are too dark on their own art, so text titles are used
+  'q2':           steam(2320, false),
+  'q3':           steam(2200, false),
+  'rtcw':         steam(9010),
+  'urt':          { shot: 'https://www.urbanterror.info/files/static/images/pics/presentation/shot0017.jpg' },
+  'hl':           steam(70),
+  'webxash':      steam(10, false),      // Counter-Strike
+  'surf':         steam(240, false),     // Counter-Strike: Source
+  'diablo':       { wide: 'https://images.gog-statics.com/2a351ec2315d2b082c120a1499434480758e56603d2cf21a93e544300c0f3829.png',
+                    tall: 'https://images.gog-statics.com/271f23dcffc02293cc3b34e5289d8e24bfc97742dae752b809884bcf6e0f9b67.jpg',
+                    wideTitled: true },  // GOG: Diablo + Hellfire
+  'gta5':         steam(271590),
+  'gta5-archive': steam(271590),
+};
+GAMES.forEach(g => { g.art = ART[g.id] || {}; });
+
+const FEATURED = ['gta-vc', 'halo', 'bo1z', 'diablo', 'q3', 'hl'];
+const TOP10 = ['gta-vc', 'halo', 'bo1z', 'q3', 'shar', 'hl', 'diablo', 'skate3', 'wasmarcade', 'surf'];
+
+const ROWS = [
+  { id: 'continue', title: 'Continue Playing', noExplore: true },
+  { id: 'mylist',   title: 'My List' },
+  { id: 'top10',    title: 'Top 10 Picks', top: true, noExplore: true },
+  { id: 'open',     title: 'Open Worlds & Sandboxes' },
+  { id: 'all',      title: 'Every Game, A to Z', tall: true },
+  { id: 'arena',    title: 'Fast Arena Shooters' },
+  { id: 'military', title: 'Squad Up: Military Shooters' },
+  { id: 'dark',     title: 'Zombies, Demons & Dark Places' },
+  { id: 'online',   title: 'Play Online With Others' },
+  { id: 'retro',    title: 'Retro PC Classics' },
+  { id: 'caution',  title: 'Unverified Links', note: 'These show a warning before opening' },
+];
+
+const REMOVED = [
+  { what: 'Moon, Kino der Toten, BO3 Cheese Cube', url: '*.pages.dev',
+    why: 'All three now redirect to an unrelated domain (lkgp.pro) instead of a game.' },
+  { what: 'Skate Rust', url: 'global-terror.net', why: 'The link goes to a clothing store, not a game.' },
+];
+
+/* ============================ utils ============================ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+const host = u => { try { return new URL(u).hostname; } catch { return u; } };
+const gutPx = () => Math.max(16, document.documentElement.clientWidth * .04);
+
+const ICON = {
+  play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 4.2v15.6L19.5 12z"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6" stroke-linecap="round" stroke-width="2.4"/><circle cx="12" cy="7.6" r="1.3" fill="currentColor" stroke="none"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.6-4.6"/></svg>',
+  left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>',
+  right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>',
+  warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4.5" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  shuffle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3.5c4.5 0 6.5 10 11 10H21M18 14l3 3-3 3M3 17h3.5c1.6 0 2.8-1.2 3.8-2.8M13.7 9.8C14.7 8.2 15.9 7 17.5 7H21M18 4l3 3-3 3"/></svg>',
+  face: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="8.5" cy="10" r=".6" fill="currentColor"/><circle cx="15.5" cy="10" r=".6" fill="currentColor"/><path d="M7.5 14.5c2.5 2.5 6.5 2.5 9 0"/></svg>',
+};
+
+/* ===================== generated key art ======================= */
+// Every game gets two pieces of art, each drawn for its own shape:
+// WIDE (16:9) for rows, previews and the banner; TALL (2:3) for posters and the phone banner.
+const WIDE = [1600, 900], TALL = [1000, 1500];
+
+function rng(seed) {
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function hash(s) { let h = 2166136261; for (const ch of s) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+const f1 = n => Math.round(n * 10) / 10;
+const doc = (W, H, defs, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs>${defs}</defs>${body}</svg>`;
+const lin = (id, stops, x2 = 0, y2 = 1) => `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}">${stops.map(([o, c, op = 1]) => `<stop offset="${f1(o * 1000) / 1000}" stop-color="${c}" stop-opacity="${op}"/>`).join('')}</linearGradient>`;
+const rad = (id, cx, cy, r, stops) => `<radialGradient id="${id}" cx="${f1(cx * 1000) / 1000}" cy="${f1(cy * 1000) / 1000}" r="${r}">${stops.map(([o, c, op = 1]) => `<stop offset="${o}" stop-color="${c}" stop-opacity="${op}"/>`).join('')}</radialGradient>`;
+const BLUR = s => `<filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${f1(s)}"/></filter>`;
+
+// Layout of a canvas: P = portrait, u = size unit (1 on the wide canvas), (fx, fy) = where the subject sits.
+// Wide art keeps the subject right of center so the banner text has room on the left;
+// tall art centers it in the upper half so the title fits underneath.
+function frame(W, H) {
+  const P = H > W;
+  return { P, u: Math.min(W, H) / 900, fx: P ? W * .5 : W * .66, fy: P ? H * .34 : H * .47 };
+}
+function stars(r, n, W, yMax, col = '#fff') {
+  let s = '';
+  for (let i = 0; i < n; i++) s += `<circle cx="${f1(r() * W)}" cy="${f1(r() * yMax)}" r="${f1(.5 + r() * 1.6)}" fill="${col}" opacity="${f1(.25 + r() * .75)}"/>`;
+  return s;
+}
+function sunMask(W, H, y0, k) {
+  let bars = '';
+  for (let i = 0; i < 7; i++) bars += `<rect x="0" y="${f1(y0 + (i * 22 + i * i * 2.6) * k)}" width="${W}" height="${f1((3 + i * 2.6) * k)}" fill="#000"/>`;
+  return `<mask id="sm"><rect width="${W}" height="${H}" fill="#fff"/>${bars}</mask>`;
+}
+function palm(r, x, base, s, fill) {
+  const h = 520 * s, lean = (r() - .5) * 150 * s, tx = x + lean, ty = base - h;
+  let g = `<path d="M${f1(x - 15 * s)},${base} Q${f1(x + lean * .15)},${f1(base - h * .5)} ${f1(tx - 6 * s)},${f1(ty)} L${f1(tx + 6 * s)},${f1(ty)} Q${f1(x + lean * .15 + 24 * s)},${f1(base - h * .5)} ${f1(x + 15 * s)},${base}Z" fill="${fill}"/>`;
+  for (const a0 of [-172, -146, -116, -64, -34, -8, 14]) {
+    const a = a0 + (r() - .5) * 14, k = f1(s * (.85 + r() * .35) * 100) / 100;
+    const tf = a < -90 ? `rotate(${f1(a + 180)}) scale(${-k},${k})` : `rotate(${f1(a)}) scale(${k})`;
+    g += `<path transform="translate(${f1(tx)},${f1(ty)}) ${tf}" d="M0,0 C60,-55 170,-50 245,28 C200,2 125,-10 72,6 C42,13 16,8 0,0Z" fill="${fill}"/>`;
+  }
+  return g;
+}
+
+const SCENES = {
+  sunset({ c1, c2 }, r, W, H) {
+    const { P, u, fx } = frame(W, H);
+    const hz = Math.round(H * (P ? .6 : .68)), hr = hz / H, sr = P ? W * .32 : 235, sy = hz - sr * .6, ink = '#0b0414';
+    let refl = '';
+    for (let i = 0; i < 10; i++) {
+      const w = sr * (1.83 - i * .153);
+      refl += `<rect x="${f1(fx - w / 2)}" y="${f1(hz + (16 + i * 26) * u)}" width="${f1(w)}" height="${f1(4 * u)}" fill="#ffb86b" opacity="${f1(.55 - i * .045)}"/>`;
+    }
+    const palms = P
+      ? palm(r, W * .05, H, 1.5 * u, ink) + palm(r, W * .25, H, .9 * u, ink) + palm(r, W * .96, H, 1.3 * u, ink)
+      : palm(r, 230, H, 1.18, ink) + palm(r, 420, H, .86, ink) + palm(r, 1480, H, 1.02, ink);
+    return doc(W, H,
+      lin('s', [[0, '#120428'], [hr - .26, c2], [hr - .04, c1], [hr + .02, '#ffb36b']]) +
+      lin('u', [[0, '#fff3a1'], [.55, '#ff9f43'], [1, c1]]) +
+      lin('w', [[0, c2], [1, '#06030e']]) + sunMask(W, H, sy + sr * .13, sr / 235),
+      `<rect width="${W}" height="${H}" fill="url(#s)"/>${stars(r, 40, W, hz * .42)}
+       <circle cx="${f1(fx)}" cy="${f1(sy)}" r="${f1(sr)}" fill="url(#u)" mask="url(#sm)"/>
+       <rect y="${hz}" width="${W}" height="${H - hz}" fill="url(#w)"/>${refl}${palms}`);
+  },
+  city({ c1, c2 }, r, W, H) {
+    const { P, u, fx } = frame(W, H);
+    const hm = P ? H / 900 * 1.15 : 1, sx = fx + (P ? 0 : 94);
+    let back = '', front = '', win = '', wins = 0;
+    for (let x = -20; x < W + 20;) { const w = (60 + r() * 100) * u, h = (200 + r() * 300) * hm; back += `<rect x="${f1(x)}" y="${f1(H - h)}" width="${f1(w)}" height="${f1(h)}"/>`; x += w + 4; }
+    for (let x = -10; x < W + 20;) {
+      const w = (60 + r() * 110) * u; let h = (130 + r() * 330) * hm; if (r() < .14) h += 220 * hm;
+      const y = H - h;
+      front += `<rect x="${f1(x)}" y="${f1(y)}" width="${f1(w)}" height="${f1(h)}"/>`;
+      for (let wy = y + 14 * u; wy < H - 20 * u; wy += 26 * u) for (let wx = x + 8 * u; wx < x + w - 12 * u; wx += 17 * u)
+        if (r() < .16 && wins++ < 560) win += `<rect x="${f1(wx)}" y="${f1(wy)}" width="${f1(7 * u)}" height="${f1(11 * u)}" opacity="${f1(.45 + r() * .5)}"/>`;
+      x += w + 3;
+    }
+    return doc(W, H,
+      lin('k', [[0, '#04050a'], [.55, c2], [1, c1]]) + rad('g', sx / W, P ? .5 : .62, .55, [[0, c1, .85], [1, c1, 0]]),
+      `<rect width="${W}" height="${H}" fill="url(#k)"/>${stars(r, 60, W, H * .33)}
+       <rect width="${W}" height="${H}" fill="url(#g)"/><circle cx="${f1(sx)}" cy="${f1(P ? H * .5 : 560)}" r="${f1(120 * u)}" fill="#ffd27a" opacity=".55"/>
+       <g fill="#000" opacity=".35">${back}</g><g fill="#06070b">${front}</g><g fill="#ffd88a">${win}</g>`);
+  },
+  clouds({ c1, c2, island }, r, W, H) {
+    const { u } = frame(W, H);
+    let cl = '';
+    for (let i = 0; i < 8; i++) {
+      const cx = r() * (W + 100) - 50, cy = 90 * u + r() * H * (island ? .42 : .71), s = (.6 + r() * .9) * u, n = 5 + Math.floor(r() * 4);
+      let puffs = '';
+      for (let j = 0; j < n; j++) puffs += `<circle cx="${f1(cx + (j - n / 2) * 55 * s + (r() - .5) * 30 * u)}" cy="${f1(cy - r() * 50 * s)}" r="${f1((45 + r() * 45) * s)}"/>`;
+      cl += `<g fill="#8fb8e6" opacity=".55" transform="translate(0,${f1(14 * s)})">${puffs}</g><g fill="#fff">${puffs}</g>`;
+    }
+    let isle = '';
+    if (island) {
+      const sea = Math.round(H * .78), k = Math.min(1, W / 1300), tx = W / 2 - 800 * k, ty = sea - 700 * k;
+      let waves = '';
+      for (let i = 0; i < 5; i++) {
+        let d = `M-40,${f1(sea + (30 + i * 36) * u)}`;
+        for (let x = 0; x < W / 50 + 2; x++) d += ` q${f1(25 * u)},${f1(-10 * u)} ${f1(50 * u)},0`;
+        waves += `<path d="${d}" stroke="#bfdbfe" stroke-width="${f1(3 * u)}" fill="none" opacity=".35"/>`;
+      }
+      isle = `<rect y="${sea}" width="${W}" height="${H - sea}" fill="#1d4ed8"/>${waves}
+        <g transform="translate(${f1(tx)},${f1(ty)}) scale(${f1(k * 100) / 100})">
+          <path d="M260,735 C340,600 560,560 760,600 C940,640 1080,560 1340,700 L1250,790 C1000,850 600,860 360,800Z" fill="#7c4a22"/>
+          <path d="M260,735 C340,600 560,560 760,600 C940,640 1080,560 1340,700" stroke="#4ade80" stroke-width="28" fill="none" stroke-linecap="round"/>
+        </g>`;
+    }
+    return doc(W, H, lin('k', [[0, c2], [1, c1]]) + rad('g', .78, .2, .5, [[0, '#fff7c2', .75], [1, '#fff7c2', 0]]),
+      `<rect width="${W}" height="${H}" fill="url(#k)"/><rect width="${W}" height="${H}" fill="url(#g)"/>${cl}${isle}`);
+  },
+  rays({ c1, c2 }, r, W, H) {
+    const { P, u } = frame(W, H);
+    const cx = W / 2, cy = H * 1.22, R = Math.hypot(W, H) * 1.6, N = 30;
+    let w = '';
+    for (let i = 0; i < N; i += 2) {
+      const a1 = Math.PI + i * Math.PI / N, a2 = Math.PI + (i + 1) * Math.PI / N;
+      w += `<path d="M${f1(cx)},${f1(cy)} L${f1(cx + R * Math.cos(a1))},${f1(cy + R * Math.sin(a1))} L${f1(cx + R * Math.cos(a2))},${f1(cy + R * Math.sin(a2))}Z"/>`;
+    }
+    const pw = P ? W * .55 : 640, top = P ? H * .52 : 400, lip = 70 * u;
+    return doc(W, H,
+      rad('k', .5, 1.15, 1.15, [[0, '#ffd166'], [.35, c1], [1, c2]]) +
+      `<pattern id="d" width="${f1(20 * u)}" height="${f1(20 * u)}" patternUnits="userSpaceOnUse"><circle cx="${f1(10 * u)}" cy="${f1(10 * u)}" r="${f1(3 * u)}" fill="#000"/></pattern>`,
+      `<rect width="${W}" height="${H}" fill="url(#k)"/><g fill="#fff" opacity=".09">${w}</g>
+       <rect width="${W}" height="${H}" fill="url(#d)" opacity=".12"/>
+       <path d="M${W},${f1(top)} L${W},${H} L${f1(W - pw)},${H} Q${f1(W - lip)},${H} ${f1(W - lip)},${f1(top)}Z" fill="#160a05" opacity=".9"/>
+       <rect x="${f1(W - lip - 8 * u)}" y="${f1(top - 8 * u)}" width="${f1(lip + 8 * u)}" height="${f1(12 * u)}" fill="#d4d4d4"/>
+       <rect y="${f1(H - 32 * u)}" width="${W}" height="${f1(32 * u)}" fill="#160a05"/>`);
+  },
+  pitch({ c1, c2 }, r, W, H) {
+    const { P, u } = frame(W, H);
+    const hz = Math.round(P ? H * .42 : 390), top = P ? H * .12 : 150, D = H - hz, spread = P ? W * .9 : 820;
+    const xl = y => W * .17 - (y - hz) / D * spread, xr = y => W * .83 + (y - hz) / D * spread;
+    const cols = ['#ffffff', '#facc15', '#60a5fa', '#f87171', '#a3e635'];
+    let crowd = '', bands = '';
+    for (let i = 0, n = P ? 620 : 520; i < n; i++) crowd += `<circle cx="${f1(r() * W)}" cy="${f1(top + r() * (hz - top - 10))}" r="${f1((1.5 + r() * 3.5) * u)}" fill="${cols[Math.floor(r() * cols.length)]}" opacity="${f1(.12 + r() * .3)}"/>`;
+    let y = hz, step = 14 * D / 510, k = 0;
+    while (y < H) {
+      const y2 = Math.min(H, y + step);
+      if (k++ % 2) bands += `<path d="M${f1(xl(y))},${f1(y)} L${f1(xr(y))},${f1(y)} L${f1(xr(y2))},${f1(y2)} L${f1(xl(y2))},${f1(y2)}Z"/>`;
+      y = y2; step *= 1.22;
+    }
+    const ym = hz + D * .33, rx = (xr(ym) - xl(ym)) * .135;
+    return doc(W, H,
+      lin('k', [[0, '#020805'], [1, c2]]) + rad('fl', .5, .5, .5, [[0, '#ffffff', .55], [1, '#ffffff', 0]]),
+      `<rect width="${W}" height="${H}" fill="url(#k)"/>${crowd}
+       <circle cx="${f1(W * .11)}" cy="${f1(40 * u)}" r="${f1(420 * u)}" fill="url(#fl)"/><circle cx="${f1(W * .89)}" cy="${f1(40 * u)}" r="${f1(420 * u)}" fill="url(#fl)"/>
+       <rect y="${hz}" width="${W}" height="${D}" fill="#0b2a17"/>
+       <path d="M${f1(xl(hz))},${hz} L${f1(xr(hz))},${hz} L${f1(xr(H))},${H} L${f1(xl(H))},${H}Z" fill="${c1}"/>
+       <g fill="#000" opacity=".14">${bands}</g>
+       <g stroke="#fff" stroke-opacity=".75" stroke-width="${f1(4 * u)}" fill="none">
+         <path d="M${f1(xl(hz))},${hz} L${f1(xr(hz))},${hz} L${f1(xr(H))},${H} M${f1(xl(H))},${H} L${f1(xl(hz))},${hz}"/>
+         <path d="M${f1(xl(ym))},${f1(ym)} L${f1(xr(ym))},${f1(ym)}"/><ellipse cx="${f1(W / 2)}" cy="${f1(ym)}" rx="${f1(rx)}" ry="${f1(rx * .27)}"/>
+       </g>`);
+  },
+  neon({ c1, c2 }, r, W, H) {
+    const { P, u } = frame(W, H);
+    const hz = Math.round(H * (P ? .56 : .6)), vy = hz - 100 * u, cx = W / 2, sr = P ? W * .3 : 210, sy = hz - 30 * u;
+    let mtn = `M0,${hz}`;
+    for (let x = 0; x <= W + 80 * u; x += 80 * u) mtn += ` L${f1(x)},${f1(hz - (30 + r() * 150 * (.35 + Math.sin(Math.min(x / W, 1) * Math.PI) * .65)) * u)}`;
+    mtn += ` L${f1(W + 80 * u)},${hz}Z`;
+    let grid = '';
+    for (let i = -24; i <= 24; i++) { const xb = cx + i * 150 * u, xt = cx + (xb - cx) * (hz - vy) / (H - vy); grid += `M${f1(xt)},${hz} L${f1(xb)},${H} `; }
+    for (let k = 1; k <= 14; k++) { const y = hz + (H - hz) * (k / 14) ** 2.1; grid += `M0,${f1(y)} L${W},${f1(y)} `; }
+    return doc(W, H,
+      lin('k', [[0, '#05010f'], [.6, c2], [1, c1]]) + lin('u', [[0, '#ffd166'], [1, '#ff3d9a']]) +
+      sunMask(W, H, sy - sr * .7, sr / 210) + lin('h', [[0, c1, 0], [.5, c1, .9], [1, c1, 0]]),
+      `<rect width="${W}" height="${hz}" fill="url(#k)"/>${stars(r, 90, W, hz * .7)}
+       <circle cx="${f1(cx)}" cy="${f1(sy)}" r="${f1(sr)}" fill="url(#u)" mask="url(#sm)"/>
+       <path d="${mtn}" fill="#0a0322" stroke="${c1}" stroke-width="${f1(3 * u)}" stroke-linejoin="round"/>
+       <rect y="${hz}" width="${W}" height="${H - hz}" fill="#05010d"/>
+       <path d="${grid}" stroke="${c1}" stroke-width="${f1(10 * u)}" opacity=".14" fill="none"/>
+       <path d="${grid}" stroke="${c1}" stroke-width="${f1(2.5 * u)}" opacity=".85" fill="none"/>
+       <rect y="${f1(hz - 16 * u)}" width="${W}" height="${f1(32 * u)}" fill="url(#h)"/>`);
+  },
+  moon({ c1, c2 }, r, W, H) {
+    const { P, u, fx } = frame(W, H);
+    const mx = fx + (P ? 0 : 44), my = P ? H * .27 : 320, mr = P ? W * .3 : 230, k = mr / 230;
+    let craters = '';
+    for (let i = 0; i < 9; i++) { const a = r() * Math.PI * 2, d = r() * 170 * k; craters += `<circle cx="${f1(mx + Math.cos(a) * d)}" cy="${f1(my + Math.sin(a) * d)}" r="${f1((14 + r() * 34) * k)}" fill="#6f5f4e" opacity="${f1(.12 + r() * .12)}"/>`; }
+    let tree = '';
+    const branch = (x, y, len, ang, w, depth) => {
+      const x2 = x + len * Math.cos(ang), y2 = y + len * Math.sin(ang);
+      tree += `<line x1="${f1(x)}" y1="${f1(y)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke-width="${f1(w)}"/>`;
+      if (depth > 0) {
+        branch(x2, y2, len * (.66 + r() * .14), ang - (.28 + r() * .36), w * .68, depth - 1);
+        branch(x2, y2, len * (.66 + r() * .14), ang + (.22 + r() * .36), w * .68, depth - 1);
+      }
+    };
+    branch(W * (P ? .16 : .206), H * .922, 175 * u * (P ? 1.1 : 1), -Math.PI / 2, 24 * u, 7);
+    let graves = '';
+    const n = P ? 5 : 8, x0 = P ? W * .36 : 640, step = P ? W * .6 / n : 118, b = H * .909;
+    for (let i = 0; i < n; i++) {
+      const x = x0 + i * step + r() * 40 * u, h = (50 + r() * 60) * u, w = (34 + r() * 24) * u;
+      graves += r() < .35
+        ? `<rect x="${f1(x + w / 2 - 6 * u)}" y="${f1(b - h - 20 * u)}" width="${f1(12 * u)}" height="${f1(h + 20 * u)}"/><rect x="${f1(x + w / 2 - 24 * u)}" y="${f1(b - h)}" width="${f1(48 * u)}" height="${f1(11 * u)}"/>`
+        : `<path d="M${f1(x)},${f1(b)} L${f1(x)},${f1(b - h + w / 2)} A${f1(w / 2)},${f1(w / 2)} 0 0 1 ${f1(x + w)},${f1(b - h + w / 2)} L${f1(x + w)},${f1(b)}Z"/>`;
+    }
+    return doc(W, H,
+      rad('k', mx / W, my / H, .9, [[0, c2], [1, '#040203']]) + rad('mn', .42, .38, .7, [[0, '#fff8ec'], [1, '#cdb898']]) +
+      rad('gl', .5, .5, .5, [[0, c1, .5], [1, c1, 0]]) + lin('fg', [[0, c1, 0], [.55, c1, .32], [1, '#040203']]),
+      `<rect width="${W}" height="${H}" fill="url(#k)"/>${stars(r, 30, W, H * .55)}
+       <circle cx="${f1(mx)}" cy="${f1(my)}" r="${f1(mr * 2.04)}" fill="url(#gl)"/><circle cx="${f1(mx)}" cy="${f1(my)}" r="${f1(mr)}" fill="url(#mn)"/>${craters}
+       <g fill="#050203" opacity=".6"><ellipse cx="${f1(mx - 100 * k)}" cy="${f1(my - 50 * k)}" rx="${f1(280 * k)}" ry="${f1(13 * k)}"/><ellipse cx="${f1(mx + 110 * k)}" cy="${f1(my + 75 * k)}" rx="${f1(240 * k)}" ry="${f1(10 * k)}"/></g>
+       <rect y="${f1(H * .555)}" width="${W}" height="${f1(H * .445)}" fill="url(#fg)"/>
+       <path d="M0,${f1(H * .933)} Q${f1(W * .25)},${f1(H * .878)} ${f1(W * .5)},${f1(H * .913)} T${W},${f1(H * .898)} L${W},${H} L0,${H}Z" fill="#040203"/>
+       <g fill="#040203">${graves}</g><g stroke="#040203" stroke-linecap="round">${tree}</g>`);
+  },
+  scope({ c1, c2 }, r, W, H) {
+    const { P, u, fx } = frame(W, H);
+    const cx = fx + (P ? 0 : 4), cy = P ? H * .36 : 420, m = 60 * u, l = 90 * u;
+    let smoke = '', ticks = '', ruin = `M0,${H}`;
+    for (let i = 0; i < 7; i++) smoke += `<circle cx="${f1(r() * W)}" cy="${f1(H * .22 + r() * H * .55)}" r="${f1((160 + r() * 220) * u)}" opacity="${f1(.05 + r() * .08)}"/>`;
+    for (let a = 0; a < 360; a += 10) {
+      const t = a * Math.PI / 180, ro = (a % 30 ? 306 : 322) * u;
+      ticks += `M${f1(cx + 292 * u * Math.cos(t))},${f1(cy + 292 * u * Math.sin(t))} L${f1(cx + ro * Math.cos(t))},${f1(cy + ro * Math.sin(t))} `;
+    }
+    for (let x = 0; x < W;) { const y = H * .71 + r() * H * .19, w = (40 + r() * 110) * u; ruin += ` L${f1(x)},${f1(y)} L${f1(x + w)},${f1(y + (r() - .5) * 40 * u)}`; x += w; }
+    ruin += ` L${W},${H}Z`;
+    const c = (rr, op, extra = '') => `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(rr * u)}" stroke-opacity="${op}" stroke-width="${f1(2 * u)}"${extra}/>`;
+    return doc(W, H,
+      lin('k', [[0, c2], [1, '#050607']]) + rad('g', cx / W, cy / H, .45, [[0, c1, .6], [1, c1, 0]]) + BLUR(70 * u) +
+      `<pattern id="gr" width="${f1(80 * u)}" height="${f1(80 * u)}" patternUnits="userSpaceOnUse"><path d="M${f1(80 * u)} 0H0V${f1(80 * u)}" fill="none" stroke="#fff" stroke-width="1"/></pattern>`,
+      `<rect width="${W}" height="${H}" fill="url(#k)"/><rect width="${W}" height="${H}" fill="url(#g)"/>
+       <rect width="${W}" height="${H}" fill="url(#gr)" opacity=".05"/>
+       <g fill="#d6d9de" filter="url(#b)">${smoke}</g>
+       <path d="${ruin}" fill="#050607"/>
+       <g stroke="#fff" fill="none">
+         ${c(70, .3)}${c(150, .22)}${c(292, .16, ` stroke-dasharray="${f1(6 * u)} ${f1(14 * u)}"`)}
+         <path d="${ticks}" stroke-opacity=".3" stroke-width="${f1(2 * u)}"/>
+         <path d="M${f1(cx - 140 * u)},${f1(cy)} H${f1(cx - 36 * u)} M${f1(cx + 36 * u)},${f1(cy)} H${f1(cx + 140 * u)} M${f1(cx)},${f1(cy - 140 * u)} V${f1(cy - 36 * u)} M${f1(cx)},${f1(cy + 36 * u)} V${f1(cy + 140 * u)}" stroke-opacity=".45" stroke-width="${f1(3 * u)}"/>
+         <path d="M${f1(m)},${f1(m + l)} V${f1(m)} H${f1(m + l)} M${f1(W - m - l)},${f1(m)} H${f1(W - m)} V${f1(m + l)} M${f1(m)},${f1(H - m - l)} V${f1(H - m)} H${f1(m + l)} M${f1(W - m - l)},${f1(H - m)} H${f1(W - m)} V${f1(H - m - l)}" stroke-opacity=".35" stroke-width="${f1(4 * u)}"/>
+       </g>
+       <circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(5 * u)}" fill="${c1}"/>`);
+  },
+  ring({ c1, c2 }, r, W, H) {
+    const { P, u } = frame(W, H);
+    const cx = W / 2, cy = P ? H * .4 : 470, rx = P ? W * 1.05 : 1180, ry = P ? 170 : 160, rot = P ? -12 : -8;
+    const R = P ? W * 1.25 : 1020, pcy = H + R - (P ? H * .17 : 200);
+    const ell = (k, sw, extra) => `<ellipse cx="${f1(cx)}" cy="${f1(cy)}" rx="${f1(rx * k)}" ry="${f1(ry * k)}" stroke-width="${f1(sw * u)}" ${extra}/>`;
+    return doc(W, H,
+      rad('k', .55, .3, .9, [[0, c2], [1, '#01030a']]) + rad('nb', .5, .5, .5, [[0, c1, .4], [1, c1, 0]]) +
+      lin('rg', [[0, '#3b82f6', .2], [.35, '#bfe6ff'], [.55, '#ffffff'], [.8, '#8fd3ff'], [1, '#3b82f6', .2]], 1, 0) +
+      rad('pl', .5, .12, .9, [[0, c1], [.4, '#06232c'], [1, '#010508']]) + BLUR(10 * u),
+      `<rect width="${W}" height="${H}" fill="url(#k)"/>${stars(r, 240, W, H)}${stars(r, 30, W, H, '#bfe3ff')}
+       <ellipse cx="${f1(W * .3)}" cy="${f1(H * .32)}" rx="${f1(W * .39)}" ry="${f1(H * .3)}" fill="url(#nb)"/>
+       <g transform="rotate(${rot} ${f1(cx)} ${f1(cy)})" fill="none">
+         ${ell(1, 44, 'stroke="url(#rg)" opacity=".14"')}${ell(1, 15, 'stroke="url(#rg)"')}${ell(.988, 2, 'stroke="#fff" opacity=".55"')}
+       </g>
+       <circle cx="${f1(cx)}" cy="${f1(pcy)}" r="${f1(R)}" fill="url(#pl)"/>
+       <circle cx="${f1(cx)}" cy="${f1(pcy)}" r="${f1(R)}" fill="none" stroke="${c1}" stroke-width="${f1(18 * u)}" opacity=".55" filter="url(#b)"/>`);
+  },
+  hell({ c1, c2 }, r, W, H) {
+    const { u } = frame(W, H);
+    const reach = W * .29;
+    const edge = d => H * .33 + d / reach * H * .46 + r() * H * .13;
+    let L = `M0,${H} L0,${f1(H * (.29 + r() * .13))}`, R = `M${W},${H} L${W},${f1(H * (.27 + r() * .13))}`;
+    for (let d = 0; d < reach;) { d += (30 + r() * 60) * u; L += ` L${f1(d)},${f1(edge(d))}`; }
+    for (let d = 0; d < reach;) { d += (30 + r() * 60) * u; R += ` L${f1(W - d)},${f1(edge(d))}`; }
+    L += ` L${f1(W * .34)},${H}Z`; R += ` L${f1(W * .66)},${H}Z`;
+    let far = `M0,${H}`;
+    for (let x = 0; x <= W + 50 * u; x += 50 * u) far += ` L${f1(x)},${f1(H * (.72 + r() * .12))}`;
+    far += ` L${f1(W + 50 * u)},${H}Z`;
+    const cols = ['#ffd27a', '#ff9a3c', '#ff5a1f'];
+    let emb = '';
+    for (let i = 0, n = Math.round(150 * W * H / 1.44e6); i < n; i++) emb += `<circle cx="${f1(r() * W)}" cy="${f1(H - Math.pow(r(), 1.7) * H * .91)}" r="${f1((.8 + r() * 3.6) * u)}" fill="${cols[Math.floor(r() * 3)]}" opacity="${f1(.35 + r() * .65)}"/>`;
+    return doc(W, H,
+      lin('k', [[0, '#030101'], [.55, c2], [1, c1]]) + rad('g', .5, 1.05, .7, [[0, '#ffb347', .85], [.5, c1, .45], [1, c1, 0]]),
+      `<rect width="${W}" height="${H}" fill="url(#k)"/><rect width="${W}" height="${H}" fill="url(#g)"/>
+       <path d="${far}" fill="${c2}" opacity=".9"/>${emb}
+       <path d="${L}" fill="#060202"/><path d="${R}" fill="#060202"/>`);
+  },
+  lab({ c1, c2 }, r, W, H) {
+    const { P, u, fx } = frame(W, H);
+    const cx = fx + (P ? 0 : 4), cy = P ? H * .38 : 430, k = P ? W * .36 / 250 : 1, g = 64 * u, band = 64 * u;
+    return doc(W, H,
+      lin('k', [[0, '#0a0705'], [1, c2]]) + rad('g', cx / W, cy / H, .5, [[0, c1, .6], [1, c1, 0]]) +
+      `<pattern id="gr" width="${f1(g)}" height="${f1(g)}" patternUnits="userSpaceOnUse"><path d="M${f1(g)} 0H0V${f1(g)}" fill="none" stroke="#fff" stroke-width="1"/></pattern>
+       <pattern id="hz" width="${f1(60 * u)}" height="${f1(60 * u)}" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="${f1(30 * u)}" height="${f1(60 * u)}" fill="#f5b301"/></pattern>`,
+      `<rect width="${W}" height="${H}" fill="url(#k)"/><rect width="${W}" height="${H}" fill="url(#gr)" opacity=".05"/>
+       <rect width="${W}" height="${H}" fill="url(#g)"/>
+       <g transform="translate(${f1(cx)},${f1(cy)}) scale(${f1(k * 100) / 100})" fill="none" stroke="${c1}">
+         <circle r="250" stroke-width="70" opacity=".1"/><circle r="250" stroke-width="22"/>
+         <path d="M-120,-170 L-40,-170 L130,190 M26,-30 L-125,190" stroke-width="96" opacity=".1"/>
+         <path d="M-120,-170 L-40,-170 L130,190 M26,-30 L-125,190" stroke-width="50"/>
+       </g>
+       <rect y="${f1(H - band)}" width="${W}" height="${f1(band)}" fill="#0b0b0b"/><rect y="${f1(H - band)}" width="${W}" height="${f1(band)}" fill="url(#hz)" opacity=".75"/>`);
+  },
+  archive(g, r, W, H) {
+    const { u } = frame(W, H);
+    let noise = '';
+    for (let i = 0, n = Math.round(500 * W * H / 1.44e6); i < n; i++) noise += `<rect x="${f1(r() * W)}" y="${f1(r() * H)}" width="${f1((2 + r() * 14) * u)}" height="${f1(2 * u)}" opacity="${f1(r() * .18)}"/>`;
+    return doc(W, H,
+      lin('k', [[0, '#52525b'], [1, '#09090b']]) +
+      `<pattern id="s" width="4" height="4" patternUnits="userSpaceOnUse"><rect width="4" height="2" fill="#000" opacity=".35"/></pattern>`,
+      `<rect width="${W}" height="${H}" fill="url(#k)"/><g fill="#fff">${noise}</g>
+       <circle cx="${f1(W / 2)}" cy="${f1(H * .45)}" r="${f1(70 * u)}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="${f1(10 * u)}" stroke-dasharray="${f1(110 * u)} ${f1(330 * u)}"/>
+       <rect width="${W}" height="${H}" fill="url(#s)"/>`);
+  },
+};
+
+// Background layers for each shape: real artwork on top, the generated scene underneath
+// (it shows through if an image fails to load). Used with `background: var(--wide)`.
+const cssURL = u => `url("${u.replace(/"/g, '%22')}")`;
+function artLayers(g) {
+  const a = g.art, shade = 'linear-gradient(rgba(14,14,14,.72),rgba(14,14,14,.72))';
+  const fill = u => `${cssURL(u)} center / cover no-repeat`;
+  const drawn = size => `url("data:image/svg+xml,${encodeURIComponent(SCENES[g.scene](g, rng(hash(g.id)), ...size))}") center / cover no-repeat #222`;
+  let wide = [], tall = [];
+  if (a.wide) wide = [fill(a.wide)];
+  else if (a.cover) wide = [`${cssURL(a.cover)} right 6% center / auto 86% no-repeat`, shade, fill(a.cover)];   // box cover on a dimmed copy of itself
+  else if (a.shot) wide = [fill(a.shot)];
+  if (a.tall) tall = [fill(a.tall)];
+  else if (a.cover) tall = [fill(a.cover)];
+  else if (a.shot) tall = [`${cssURL(a.shot)} center 36% / 94% auto no-repeat`, shade, fill(a.shot)];
+  return { wide: [...wide, drawn(WIDE)].join(', '), tall: [...tall, drawn(TALL)].join(', ') };
+}
+function buildArt() {
+  const el = document.createElement('style');
+  el.textContent = GAMES.map(g => { const l = artLayers(g); return `.a-${g.id}{--wide:${l.wide};--tall:${l.tall}}`; }).join('\n');
+  document.head.appendChild(el);
+}
+
+/* ============================ state ============================ */
+const byId = Object.fromEntries(GAMES.map(g => [g.id, g]));
+const favs = new Set(store.get('pw.favs', []).filter(id => byId[id]));
+let recent = store.get('pw.recent', [])
+  .map(x => (typeof x === 'string' ? { id: x, t: 0 } : x))
+  .filter(x => x && byId[x.id]);
+const state = { view: 'home', q: '', newTab: store.get('pw.newtab', true) };
+const pending = new Set();
+
+const target = () => (state.newTab ? '_blank' : '_self');
+
+function markPlayed(id) {
+  recent = [{ id, t: Date.now() }, ...recent.filter(x => x.id !== id)].slice(0, 8);
+  store.set('pw.recent', recent);
+}
+function playedLabel(id) {
+  const e = recent.find(x => x.id === id);
+  if (!e || !e.t) return 'Played recently';
+  const s = (Date.now() - e.t) / 1000, rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  if (s < 60) return 'Played just now';
+  if (s < 3600) return 'Played ' + rtf.format(-Math.round(s / 60), 'minute');
+  if (s < 86400) return 'Played ' + rtf.format(-Math.round(s / 3600), 'hour');
+  return 'Played ' + rtf.format(-Math.round(s / 86400), 'day');
+}
+
+function rowGames(id) {
+  if (id === 'continue') return recent.map(x => byId[x.id]);
+  if (id === 'mylist') return [...favs].map(id => byId[id]);
+  if (id === 'top10') return TOP10.map(id => byId[id]);
+  if (id === 'all') return GAMES.filter(g => !g.caution).sort((a, b) => a.title.localeCompare(b.title));
+  return GAMES.filter(g => g.rows.includes(id));
+}
+
+const PAGES = {
+  open:     { title: 'Open Worlds & Sandboxes', list: () => rowGames('open') },
+  shooters: { title: 'Shooters', list: () => GAMES.filter(g => g.rows.some(r => r === 'arena' || r === 'military')) },
+  zombies:  { title: 'Zombies, Demons & Dark Places', list: () => rowGames('dark') },
+  list:     { title: 'My List', list: () => rowGames('mylist'), empty: 'Your list is empty. Hover a game and press + to add it here.' },
+};
+const NAV = [
+  { go: 'home', label: 'Home' },
+  { go: 'open', label: 'Open Worlds' },
+  { go: 'shooters', label: 'Shooters' },
+  { go: 'zombies', label: 'Zombies' },
+  { go: 'list', label: 'My List' },
+  { go: 'shuffle', label: 'Play Something', icon: ICON.shuffle },
+];
+
+/* ======================== HTML builders ======================== */
+// ctx: 'wide' (cards, previews, popup), 'tall' (posters) or 'hero' (banner: always shows a title)
+function ttHTML(g, ctx = 'wide') {
+  const a = g.art;
+  if (ctx === 'tall' && (a.tall || a.cover)) return '';   // real covers already show the title
+  if (ctx !== 'tall' && a.logo) return `<span class="tt tt-img"><img src="${esc(a.logo)}" alt="${esc(g.title)}" loading="lazy" decoding="async"></span>`;
+  if (ctx === 'wide' && a.wideTitled) return '';
+  const t = g.tt, st = [`--tf:'${t.f}'`, `--tc:${t.c}`, `--ts:${t.s || 1}`];
+  if (ctx !== 'tall' && a.cover) st.push('max-width:52%');   // keep clear of the box cover on the right
+  if (t.g) st.push(`--tg:${t.g}`);
+  if (t.st) st.push(`--tst:${t.st}`, `--tsw:${t.sw || .04}em`);
+  if (t.ls) st.push(`--tls:${t.ls}em`);
+  if (t.up) st.push('--ttx:uppercase');
+  if (t.i) st.push('--tfs:italic');
+  if (t.r) st.push(`--tr:${t.r}deg`);
+  return `<span class="tt" style="${st.join(';')}">${t.k ? `<span class="tt-k">${esc(t.k)}</span>` : ''}<span class="tt-m">${esc(t.t)}</span>${t.sub ? `<span class="tt-s">${esc(t.sub)}</span>` : ''}</span>`;
+}
+
+// Normal games are real links. Unverified games are buttons that open the details/warning instead.
+function playEl(g, cls, inner, label) {
+  return g.caution
+    ? `<button type="button" class="${cls}" data-detail="${g.id}" aria-label="${esc(label)}">${inner}</button>`
+    : `<a class="${cls}" href="${esc(g.url)}" target="${target()}" rel="noopener noreferrer" data-play="${g.id}" aria-label="${esc(label)}">${inner}</a>`;
+}
+function favBtn(g, cls) {
+  const on = favs.has(g.id);
+  return `<button type="button" class="${cls}" data-fav="${g.id}" aria-pressed="${on}" aria-label="${on ? 'Remove from' : 'Add to'} My List">${on ? ICON.check : ICON.plus}</button>`;
+}
+function metaHTML(g) {
+  const rank = TOP10.indexOf(g.id);
+  return [
+    rank >= 0 ? `<span class="t10" title="#${rank + 1} in Top 10 Picks">TOP<b>10</b></span>` : '',
+    g.caution ? '<span class="warn-tag">Unverified</span>' : '',
+    g.year ? `<span>${g.year}</span>` : '',
+    ...(g.badges || []).map(b => `<span class="box">${esc(b)}</span>`),
+  ].join('');
+}
+
+function cardHTML(g, v, i) {
+  const ribbon = g.caution ? '<span class="ribbon warn">Unverified</span>' : g.ribbon ? `<span class="ribbon">${esc(g.ribbon)}</span>` : '';
+  const corner = TOP10.includes(g.id) && v !== 'top' ? '<span class="t10 corner">TOP<b>10</b></span>' : '';
+  const cls = `card-hit a-${g.id}${v === 'top' || v === 'tall' ? ' poster' : ''}${ribbon && v !== 'top' ? ' has-ribbon' : ''}`;
+  const hit = playEl(g, cls, ttHTML(g, v === 'top' || v === 'tall' ? 'tall' : 'wide') + (v === 'top' ? '' : corner + ribbon), (g.caution ? 'Details for ' : 'Play ') + g.title);
+  return `<div class="card card-${v}" data-id="${g.id}">
+    ${v === 'top' ? `<span class="rank" aria-hidden="true">${i + 1}</span>` : ''}${hit}
+    <button class="card-more" type="button" data-detail="${g.id}" aria-label="More info about ${esc(g.title)}">${ICON.info}</button>
+    ${v === 'recent' ? `<div class="card-sub">${playedLabel(g.id)}</div>` : ''}
+  </div>`;
+}
+
+/* ============================ hero ============================= */
+let heroIdx = 0, heroLayer = 0, heroTimer = null;
+function heroContentHTML(g) {
+  const rank = TOP10.indexOf(g.id);
+  return `<div class="hero-kicker"><span class="mark">PW</span><span>GAME</span></div>
+    <div class="hero-tt">${ttHTML(g, 'hero')}</div>
+    ${rank >= 0 ? `<div class="hero-rank"><span class="t10">TOP<b>10</b></span>#${rank + 1} in Top 10 Picks</div>` : ''}
+    <p class="hero-desc">${esc(g.desc)}</p>
+    <div class="hero-actions">
+      ${playEl(g, 'btn btn-play', `${ICON.play}<span>Play</span>`, 'Play ' + g.title)}
+      <button class="btn btn-info" type="button" data-detail="${g.id}">${ICON.info}<span>More Info</span></button>
+    </div>
+    <div class="hero-dots">${FEATURED.map((id, i) => `<button class="hero-dot${i === heroIdx ? ' on' : ''}" type="button" data-hero="${i}" aria-label="Show ${esc(byId[id].title)}"><i></i></button>`).join('')}</div>`;
+}
+function renderHero(i, instant) {
+  heroIdx = (i + FEATURED.length) % FEATURED.length;
+  const g = byId[FEATURED[heroIdx]];
+  const layers = [$('#heroA'), $('#heroB')];
+  const next = layers[heroLayer ^ 1], cur = layers[heroLayer];
+  next.className = `hero-art a-${g.id}`;
+  void next.offsetWidth;
+  next.classList.add('on');
+  cur.classList.remove('on');
+  heroLayer ^= 1;
+  $('#heroRating').textContent = g.year || (g.badges && g.badges[0]) || '';
+  $('#hero').classList.toggle('titled-tall', !!(g.art.tall || g.art.cover));
+  const box = $('#heroContent');
+  clearTimeout(heroTimer);
+  if (instant) { box.innerHTML = heroContentHTML(g); return; }
+  box.classList.add('fade');
+  heroTimer = setTimeout(() => { box.innerHTML = heroContentHTML(g); box.classList.remove('fade'); }, 300);
+}
+
+/* ============================ rows ============================= */
+function renderRow(id) {
+  const def = ROWS.find(r => r.id === id), slot = document.querySelector(`[data-row="${id}"]`);
+  const list = rowGames(id).filter(Boolean);
+  if (!list.length) { slot.hidden = true; slot.innerHTML = ''; return; }
+  const v = def.top ? 'top' : def.tall ? 'tall' : id === 'continue' ? 'recent' : 'row';
+  slot.hidden = false;
+  slot.innerHTML = `<div class="row-head"><h2 class="row-title">${esc(def.title)}</h2>
+      ${def.note ? `<span class="row-note">${esc(def.note)}</span>` : ''}
+      ${def.noExplore ? '' : `<button class="explore" type="button" data-go="row:${id}">Explore all ›</button>`}</div>
+    <div class="row-wrap">
+      <button class="row-arrow prev" type="button" data-scroll="-1" aria-label="Scroll ${esc(def.title)} left" hidden>${ICON.left}</button>
+      <div class="track${v === 'tall' ? ' track-tall' : ''}">${list.map((g, i) => cardHTML(g, v, i)).join('')}</div>
+      <button class="row-arrow next" type="button" data-scroll="1" aria-label="Scroll ${esc(def.title)} right">${ICON.right}</button>
+    </div>`;
+  updateArrows(slot.querySelector('.track'));
+}
+function updateArrows(track) {
+  if (!track) return;
+  const wrap = track.parentElement;
+  wrap.querySelector('.prev').hidden = track.scrollLeft < 4;
+  wrap.querySelector('.next').hidden = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+}
+function renderRows() { ROWS.forEach(r => renderRow(r.id)); }
+function refreshRow(id) {
+  // Re-rendering moves cards around, so wait while a hover preview is open
+  if (!$('#preview').hidden) pending.add(id); else renderRow(id);
+}
+
+/* ======================= pages & nav =========================== */
+function renderPage() {
+  let title = '', note = '', list = [];
+  if (state.view === 'search') {
+    const q = state.q.trim(), ql = q.toLowerCase();
+    list = GAMES.filter(g => [g.title, g.desc, g.tt.k, g.tt.t, ...g.tags].join(' ').toLowerCase().includes(ql));
+    title = list.length ? `Results for “${q}”` : 'No matches';
+    if (!list.length) note = `Nothing matched “${q}”. Try a title like Quake, or a genre like zombies or football.`;
+  } else if (state.view.startsWith('row:')) {
+    const id = state.view.slice(4), def = ROWS.find(r => r.id === id);
+    title = def.title; note = def.note || ''; list = rowGames(id);
+  } else {
+    const p = PAGES[state.view];
+    title = p.title; list = p.list();
+    if (!list.length) note = p.empty || '';
+  }
+  $('#pageTitle').textContent = title;
+  $('#pageNote').textContent = note;
+  $('#pageNote').hidden = !note;
+  $('#pageGrid').innerHTML = list.map(g => cardHTML(g, 'grid')).join('');
+}
+function renderView() {
+  const home = state.view === 'home';
+  $('#hero').hidden = !home;
+  $('#rows').hidden = !home;
+  $('#page').hidden = home;
+  if (!home) renderPage();
+  $('#nav').classList.toggle('solid', !home || scrollY > 10);
+  document.querySelectorAll('.links a, .subnav a').forEach(a => a.classList.toggle('active', a.dataset.go === state.view));
+}
+function go(dest) {
+  hidePreview(); closeMenu();
+  if (dest === 'shuffle') return shuffle();
+  if (dest !== 'search') { state.q = ''; $('#q').value = ''; $('#qClear').hidden = true; if (document.activeElement !== $('#q')) $('#search').classList.remove('open'); }
+  state.view = dest;
+  renderView();
+  window.scrollTo({ top: 0 });
+}
+function shuffle() {
+  const pool = GAMES.filter(g => !g.caution);
+  const g = pool[Math.floor(Math.random() * pool.length)];
+  markPlayed(g.id);
+  if (state.newTab) { window.open(g.url, '_blank', 'noopener,noreferrer'); refreshRow('continue'); }
+  else location.href = g.url;
+}
+function renderAll() {
+  renderHero(heroIdx, true);
+  renderRows();
+  if (state.view !== 'home') renderPage();
+}
+
+/* ======================== hover preview ======================== */
+const preview = $('#preview');
+const canHover = matchMedia('(hover: hover) and (pointer: fine)');
+let pvTimer = null, pvFor = null;
+
+function previewHTML(g) {
+  return `${playEl(g, `pv-art a-${g.id}`, ttHTML(g), (g.caution ? 'Details for ' : 'Play ') + g.title)}
+    <div class="pv-body">
+      <div class="pv-actions">
+        ${playEl(g, 'circle play', ICON.play, (g.caution ? 'Details for ' : 'Play ') + g.title)}
+        ${favBtn(g, 'circle')}
+        <button class="circle more" type="button" data-detail="${g.id}" aria-label="More info about ${esc(g.title)}">${ICON.down}</button>
+      </div>
+      <div class="pv-meta">${metaHTML(g)}</div>
+      <div class="pv-tags">${g.tags.map(t => `<span>${esc(t)}</span>`).join('')}</div>
+    </div>`;
+}
+function showPreview(hit) {
+  const g = byId[hit.closest('.card').dataset.id];
+  const r = hit.getBoundingClientRect();
+  if (r.width < 110 || !hit.isConnected) return;
+  const vw = document.documentElement.clientWidth, gut = gutPx();
+  const pw = Math.round(Math.min(Math.max(r.width * 1.5, 300), 470)), artH = pw * 9 / 16;
+  let left = r.left + r.width / 2 - pw / 2;
+  left = Math.max(gut, Math.min(left, vw - gut - pw));
+  const top = Math.max(scrollY + 8, r.top + scrollY + r.height / 2 - artH / 2);
+  preview.innerHTML = previewHTML(g);
+  preview.style.cssText = `left:${left + scrollX}px;top:${top}px;width:${pw}px;--ps:${r.width / pw};transform-origin:${r.left + r.width / 2 - left}px ${artH / 2}px`;
+  preview.classList.remove('show');
+  preview.hidden = false;
+  pvFor = hit;
+  void preview.offsetWidth;
+  preview.classList.add('show');
+}
+function hidePreview() {
+  clearTimeout(pvTimer);
+  if (preview.hidden) return;
+  pvFor = null;
+  preview.classList.remove('show');
+  preview.hidden = true;
+  pending.forEach(id => renderRow(id));
+  pending.clear();
+}
+document.addEventListener('mouseover', e => {
+  if (!canHover.matches) return;
+  const hit = e.target.closest('.card .card-hit');
+  if (!hit || hit === pvFor) return;
+  clearTimeout(pvTimer);
+  pvTimer = setTimeout(() => showPreview(hit), 420);
+});
+document.addEventListener('mouseout', e => {
+  const hit = e.target.closest('.card .card-hit');
+  if (!hit) return;
+  if (e.relatedTarget && (hit.contains(e.relatedTarget) || preview.contains(e.relatedTarget))) return;
+  clearTimeout(pvTimer);
+});
+preview.addEventListener('mouseleave', hidePreview);
+
+/* ======================== detail modal ========================= */
+const detail = $('#detail');
+function moreCard(m) {
+  return `<div class="m-card">
+    ${playEl(m, `m-art a-${m.id}`, ttHTML(m) + `<span class="m-play">${ICON.play}</span>`, (m.caution ? 'Details for ' : 'Play ') + m.title)}
+    <div class="m-body">
+      <div class="m-top"><span>${[m.year, ...(m.badges || []).slice(0, 1)].filter(Boolean).map(esc).join(' · ')}</span>${favBtn(m, 'circle sm')}</div>
+      <div class="m-title">${esc(m.title)}</div>
+      <p>${esc(m.desc)}</p>
+    </div>
+  </div>`;
+}
+function openDetail(g) {
+  hidePreview(); closeMenu();
+  let more = GAMES.filter(x => x !== g && !x.caution && x.rows.some(r => g.rows.includes(r)));
+  if (more.length < 3) more = more.concat(TOP10.map(id => byId[id]).filter(x => x !== g && !more.includes(x)));
+  more = more.slice(0, 6);
+  const play = g.caution
+    ? `<a class="btn btn-warn" href="${esc(g.url)}" target="${target()}" rel="noopener noreferrer" data-play="${g.id}">${ICON.warn}<span>Open anyway</span></a>`
+    : `<a class="btn btn-play" href="${esc(g.url)}" target="${target()}" rel="noopener noreferrer" data-play="${g.id}">${ICON.play}<span>Play</span></a>`;
+  $('#detailBody').innerHTML = `
+    <div class="d-hero grain a-${g.id}">
+      <button class="d-close" type="button" data-close aria-label="Close">${ICON.close}</button>
+      <div class="d-hero-in">
+        <div class="d-tt">${ttHTML(g)}</div>
+        <div class="d-actions">${play}${favBtn(g, 'circle big')}</div>
+      </div>
+    </div>
+    <div class="d-body">
+      ${g.caution ? `<div class="d-warn">${ICON.warn}<div><b>Unverified link.</b> ${esc(g.caution)} Never enter passwords or payment details there.</div></div>` : ''}
+      <div class="d-cols">
+        <div><div class="d-meta">${metaHTML(g)}</div><p class="d-desc">${esc(g.desc)}</p></div>
+        <div class="d-side">
+          <p><span>Genres:</span> ${g.tags.map(esc).join(', ')}</p>
+          <p><span>Plays at:</span> ${esc(host(g.url))}</p>
+          <p><span>Link checked:</span> ${CHECKED}</p>
+        </div>
+      </div>
+      ${more.length ? `<h3 class="d-h3">More Like This</h3><div class="d-more">${more.map(moreCard).join('')}</div>` : ''}
+    </div>`;
+  detail.setAttribute('aria-label', g.title);
+  if (!detail.open) { detail.showModal(); document.body.classList.add('modal-open'); }
+  detail.scrollTop = 0;
+  detail.querySelector('.d-actions a').focus({ preventScroll: true });
+}
+detail.addEventListener('close', () => document.body.classList.remove('modal-open'));
+detail.addEventListener('click', e => { if (e.target === detail || e.target.closest('[data-close]')) detail.close(); });
+
+/* ============================ menu ============================= */
+const menu = $('#menu'), avatarBtn = $('#avatarBtn');
+function closeMenu() { menu.hidden = true; avatarBtn.setAttribute('aria-expanded', 'false'); }
+avatarBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  menu.hidden = !menu.hidden;
+  avatarBtn.setAttribute('aria-expanded', String(!menu.hidden));
+});
+document.addEventListener('click', e => { if (!menu.hidden && !e.target.closest('.profile')) closeMenu(); });
+const newTabBox = $('#newtab');
+newTabBox.checked = state.newTab;
+newTabBox.addEventListener('change', () => { state.newTab = newTabBox.checked; store.set('pw.newtab', state.newTab); renderAll(); });
+$('#clearRecent').addEventListener('click', () => { recent = []; store.set('pw.recent', recent); renderRow('continue'); closeMenu(); });
+$('#showRemoved').addEventListener('click', () => {
+  closeMenu();
+  $('#removed').open = true;
+  $('#removed').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+/* ============================ search =========================== */
+const search = $('#search'), q = $('#q'), qClear = $('#qClear');
+$('#searchBtn').addEventListener('click', () => { search.classList.add('open'); q.focus(); });
+q.addEventListener('blur', () => { if (!q.value) search.classList.remove('open'); });
+q.addEventListener('input', () => {
+  state.q = q.value;
+  qClear.hidden = !q.value;
+  if (q.value.trim()) { state.view = 'search'; hidePreview(); renderView(); window.scrollTo({ top: 0 }); }
+  else go('home');
+});
+qClear.addEventListener('click', () => { q.value = ''; q.focus(); go('home'); search.classList.add('open'); });
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement !== q && !detail.open && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) {
+    e.preventDefault(); search.classList.add('open'); q.focus();
+  }
+  if (e.key === 'Escape' && document.activeElement === q) { q.value = ''; q.blur(); go('home'); }
+});
+
+/* ======================= global clicks ========================= */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-play],[data-detail],[data-fav],[data-go],[data-scroll],[data-hero]');
+  if (!t) return;
+  const d = t.dataset;
+  if (d.play) {                       // real link: let the browser follow it
+    markPlayed(d.play);
+    hidePreview();
+    if (detail.open) detail.close();
+    if (state.newTab) refreshRow('continue');
+    return;
+  }
+  e.preventDefault();
+  if (d.detail) return openDetail(byId[d.detail]);
+  if (d.go) return go(d.go);
+  if (d.hero) return renderHero(+d.hero);
+  if (d.scroll) {
+    const track = t.parentElement.querySelector('.track');
+    track.scrollBy({ left: +d.scroll * (track.clientWidth - 2 * gutPx()), behavior: 'smooth' });
+    return;
+  }
+  if (d.fav) {
+    const id = d.fav;
+    favs.has(id) ? favs.delete(id) : favs.add(id);
+    store.set('pw.favs', [...favs]);
+    document.querySelectorAll(`[data-fav="${id}"]`).forEach(b => {
+      const on = favs.has(id);
+      b.setAttribute('aria-pressed', on);
+      b.setAttribute('aria-label', `${on ? 'Remove from' : 'Add to'} My List`);
+      b.innerHTML = on ? ICON.check : ICON.plus;
+    });
+    if (detail.open) renderRow('mylist'); else refreshRow('mylist');
+    if (state.view === 'list') renderPage();
+  }
+});
+
+$('#hero').addEventListener('animationend', e => { if (e.animationName === 'heroFill') renderHero(heroIdx + 1); });
+$('#rows').addEventListener('scroll', e => {
+  if (e.target.classList && e.target.classList.contains('track')) { updateArrows(e.target); hidePreview(); }
+}, true);
+addEventListener('scroll', () => {
+  $('#nav').classList.toggle('solid', state.view !== 'home' || scrollY > 10);
+  hidePreview();
+}, { passive: true });
+addEventListener('resize', () => { hidePreview(); document.querySelectorAll('.track').forEach(updateArrows); });
+
+/* ============================ init ============================= */
+buildArt();
+$('#searchBtn').innerHTML = ICON.search;
+qClear.innerHTML = ICON.close;
+avatarBtn.innerHTML = ICON.face;
+const navLinks = NAV.map(n => `<a href="#" data-go="${n.go}">${n.icon || ''}${n.label}</a>`).join('');
+$('#links').innerHTML = navLinks;
+$('#subnav').innerHTML = navLinks;
+$('#fLinks').innerHTML = NAV.map(n => `<a href="#" data-go="${n.go}">${n.label}</a>`).join('');
+$('#rows').innerHTML = ROWS.map(r => `<section class="row" id="row-${r.id}" data-row="${r.id}" hidden></section>`).join('');
+$('#checked').textContent = CHECKED;
+$('#removedList').innerHTML = REMOVED.map(r => `<li><b>${esc(r.what)}</b> (${esc(r.url)}): ${esc(r.why)}</li>`).join('');
+renderHero(0, true);
+renderRows();
+renderView();
+</script>
+</body>
+</html>
